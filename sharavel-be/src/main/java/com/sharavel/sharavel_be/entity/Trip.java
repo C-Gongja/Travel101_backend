@@ -1,9 +1,13 @@
 package com.sharavel.sharavel_be.entity;
 
-import java.math.BigDecimal;
 import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -14,64 +18,88 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 
 @Entity
-public class TripEntity {
+public class Trip {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(nullable = false)
-	private Integer id;
+	private Long id;
+
+	@Column(nullable = false, unique = true, updatable = false)
+	private String uuid;
 
 	@ManyToOne
 	@JoinColumn(name = "user_id", nullable = false)
-	private UserEntity uid;
+	private Users uid;
 
 	@OneToMany(mappedBy = "tripId", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<DaysEntity> days = new ArrayList<>();
+	private List<Days> days = new ArrayList<>();
 
 	@Column(nullable = false)
 	private String name;
 
-	// startDate
 	@Column(nullable = true)
 	private Date startDate;
-	// endDate
+
 	@Column(nullable = true)
 	private Date endDate;
-	// total_cost
-	@Column(nullable = false)
-	private BigDecimal total_cost;
-	// status (completed or not?)
+
+	// planned, ongoing, completed
 	@Column(nullable = false)
 	private boolean isCompleted;
-	// scripts
+
 	@Column(nullable = false)
-	private Integer scripted;
-	// countries[]
-	@Column(nullable = false)
+	private Long scripted;
+
+	@Column(nullable = true)
 	private List<String> countries;
 
-	public Integer getId() {
+	@CreationTimestamp
+	@Column(updatable = false, name = "created_at")
+	private LocalDateTime createdAt;
+
+	@UpdateTimestamp
+	@Column(name = "updated_at")
+	private LocalDateTime updatedAt;
+
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
-	public UserEntity getUid() {
+	public String getUuid() {
+		return uuid;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
+
+	@PrePersist
+	public void generateUUID() {
+		if (this.uuid == null) {
+			this.uuid = UUID.randomUUID().toString(); // UUID 자동 생성
+		}
+	}
+
+	public Users getUid() {
 		return uid;
 	}
 
-	public void setUid(UserEntity uid) {
+	public void setUid(Users uid) {
 		this.uid = uid;
 	}
 
-	public List<DaysEntity> getDays() {
+	public List<Days> getDays() {
 		return days;
 	}
 
-	public void setDays(List<DaysEntity> days) {
+	public void setDays(List<Days> days) {
 		this.days = days;
 	}
 
@@ -99,14 +127,6 @@ public class TripEntity {
 		this.endDate = endDate;
 	}
 
-	public BigDecimal getTotal_cost() {
-		return total_cost;
-	}
-
-	public void setTotal_cost(BigDecimal total_cost) {
-		this.total_cost = total_cost;
-	}
-
 	public boolean isCompleted() {
 		return isCompleted;
 	}
@@ -115,11 +135,11 @@ public class TripEntity {
 		this.isCompleted = isCompleted;
 	}
 
-	public Integer getScripted() {
+	public Long getScripted() {
 		return scripted;
 	}
 
-	public void setScripted(Integer scripted) {
+	public void setScripted(Long scripted) {
 		this.scripted = scripted;
 	}
 
@@ -129,5 +149,21 @@ public class TripEntity {
 
 	public void setCountries(List<String> countries) {
 		this.countries = countries;
+	}
+
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public LocalDateTime getUpdatedAt() {
+		return updatedAt;
+	}
+
+	public void setUpdatedAt(LocalDateTime updatedAt) {
+		this.updatedAt = updatedAt;
 	}
 }

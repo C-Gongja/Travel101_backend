@@ -13,8 +13,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.sharavel.sharavel_be.dto.AuthDto;
-import com.sharavel.sharavel_be.entity.RoleEntity;
-import com.sharavel.sharavel_be.entity.UserEntity;
+import com.sharavel.sharavel_be.entity.Roles;
+import com.sharavel.sharavel_be.entity.Users;
 import com.sharavel.sharavel_be.repository.RoleRepo;
 import com.sharavel.sharavel_be.repository.UserRepo;
 import com.sharavel.sharavel_be.security.CustomUserDetails;
@@ -46,17 +46,17 @@ public class AuthServiceImpl implements AuthService {
 					.body(("Email is already taken"));
 		}
 
-		UserEntity user = new UserEntity();
+		Users user = new Users();
 		user.setName(request.getName());
 		user.setEmail(request.getEmail());
 		user.setPassword(passwordEncoder.encode(request.getPassword()));
 		user.setCreatedAt(LocalDateTime.now());
 
-		RoleEntity userRole = roleRepository.findByName(RoleConstants.ROLE_USER)
+		Roles userRole = roleRepository.findByName(RoleConstants.ROLE_USER)
 				.orElseThrow(() -> new IllegalStateException("USER role Internal Error"));
 		user.setRoles(Collections.singleton(userRole));
 
-		UserEntity savedUser = userRepository.save(user);
+		Users savedUser = userRepository.save(user);
 
 		CustomUserDetails userDetails = new CustomUserDetails(savedUser);
 
@@ -67,7 +67,7 @@ public class AuthServiceImpl implements AuthService {
 		refreshCookie.setHttpOnly(true);
 		refreshCookie.setSecure(false); // 개발 환경
 		refreshCookie.setPath("/");
-		refreshCookie.setMaxAge(60 * 60);
+		refreshCookie.setMaxAge(86400000);
 		response.addCookie(refreshCookie);
 
 		return ResponseEntity.ok(new AuthDto(
@@ -79,7 +79,7 @@ public class AuthServiceImpl implements AuthService {
 	public ResponseEntity<?> login(Authentication authentication, HttpServletResponse response) {
 		try {
 			String email = authentication.getName();
-			UserEntity user = userRepository.findByEmail(email).orElse(null);
+			Users user = userRepository.findByEmail(email).orElse(null);
 
 			if (user == null) {
 				return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -97,7 +97,7 @@ public class AuthServiceImpl implements AuthService {
 			refreshCookie.setHttpOnly(true); // JavaScript 접근 방지
 			refreshCookie.setSecure(true); // HTTPS에서만 전송 (개발 환경 제외)
 			refreshCookie.setPath("/"); // 전체 경로에서 사용
-			refreshCookie.setMaxAge(60 * 60);
+			refreshCookie.setMaxAge(86400000);
 			response.addCookie(refreshCookie);
 
 			return ResponseEntity.ok(new AuthDto(
@@ -125,7 +125,7 @@ public class AuthServiceImpl implements AuthService {
 			}
 
 			String email = jwtUtil.extractUsername(refreshToken);
-			UserEntity user = userRepository.findByEmail(email)
+			Users user = userRepository.findByEmail(email)
 					.orElseThrow(() -> new IllegalStateException("User not found"));
 
 			CustomUserDetails userDetails = new CustomUserDetails(user);
@@ -142,7 +142,7 @@ public class AuthServiceImpl implements AuthService {
 			refreshCookie.setHttpOnly(true); // JavaScript 접근 방지
 			refreshCookie.setSecure(false); // HTTPS에서만 전송 (개발 환경 제외)
 			refreshCookie.setPath("/"); // 전체 경로에서 사용
-			refreshCookie.setMaxAge(60 * 60);
+			refreshCookie.setMaxAge(86400000);
 			response.addCookie(refreshCookie);
 
 			return ResponseEntity.ok(new AuthDto(

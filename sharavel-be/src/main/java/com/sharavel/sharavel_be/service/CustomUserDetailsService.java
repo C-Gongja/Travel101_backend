@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.sharavel.sharavel_be.entity.UserEntity;
+import com.sharavel.sharavel_be.entity.Users;
 import com.sharavel.sharavel_be.repository.UserRepo;
 import com.sharavel.sharavel_be.security.CustomUserDetails;
 
@@ -20,7 +20,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-		Optional<UserEntity> userDetail = repository.findByEmail(email); // Assuming 'email' is used as username
+		Optional<Users> userDetail = repository.findByEmail(email); // Assuming 'email' is used as username
 
 		// Converting UserInfo to UserDetails
 		return userDetail.map(CustomUserDetails::new)

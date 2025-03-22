@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -20,15 +21,19 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 @Table(name = "users")
 @Entity
-public class UserEntity {
+public class Users {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(nullable = false)
-	private Integer id;
+	private Long id;
+
+	@Column(nullable = false, unique = true, updatable = false)
+	private String uuid;
 
 	@Column(nullable = false)
 	private String name;
@@ -52,11 +57,11 @@ public class UserEntity {
 	private String city;
 
 	@OneToMany(mappedBy = "uid", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<TripEntity> trips = new ArrayList<>();
+	private List<Trip> trips = new ArrayList<>();
 
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
 	@JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
-	private Set<RoleEntity> roles = new HashSet<>();
+	private Set<Roles> roles = new HashSet<>();
 
 	@CreationTimestamp
 	@Column(updatable = false, name = "created_at")
@@ -66,12 +71,27 @@ public class UserEntity {
 	@Column(name = "updated_at")
 	private LocalDateTime updatedAt;
 
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public String getUuid() {
+		return uuid;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
+
+	@PrePersist
+	public void generateUUID() {
+		if (this.uuid == null) {
+			this.uuid = UUID.randomUUID().toString(); // UUID 자동 생성
+		}
 	}
 
 	public String getName() {
@@ -106,11 +126,11 @@ public class UserEntity {
 		this.password = password;
 	}
 
-	public Set<RoleEntity> getRoles() {
+	public Set<Roles> getRoles() {
 		return roles;
 	}
 
-	public void setRoles(Set<RoleEntity> roles) {
+	public void setRoles(Set<Roles> roles) {
 		this.roles = roles;
 	}
 
@@ -154,12 +174,11 @@ public class UserEntity {
 		this.city = city;
 	}
 
-	public List<TripEntity> getTrips() {
+	public List<Trip> getTrips() {
 		return trips;
 	}
 
-	public void setTrips(List<TripEntity> trips) {
+	public void setTrips(List<Trip> trips) {
 		this.trips = trips;
 	}
-
 }

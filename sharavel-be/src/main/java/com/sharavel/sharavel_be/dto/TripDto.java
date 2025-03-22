@@ -1,15 +1,29 @@
 package com.sharavel.sharavel_be.dto;
 
 import java.sql.Date;
+import java.util.List;
 
 public class TripDto {
+	private String id;
 	private String name;
-	// startDate
 	private Date startDate;
-	// endDate
 	private Date endDate;
-
 	private boolean isCompleted;
+	private Long scripted;
+	private List<String> countries;
+	private List<DaysDto> days;
+
+	public TripDto() {
+	}
+
+	// get trip uuid
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
 
 	public String getName() {
 		return name;
@@ -43,7 +57,40 @@ public class TripDto {
 		this.isCompleted = isCompleted;
 	}
 
-	// do a user need to fix the countries in Trip level? or should it be
-	// automatically updates when user make days plans?
-	// private List<String> countries;
+	public List<String> getCountries() {
+		return countries;
+	}
+
+	public void setCountries(List<String> countries) {
+		this.countries = countries;
+	}
+
+	public List<DaysDto> getDays() {
+		return days;
+	}
+
+	public void setDays(List<DaysDto> days) {
+		this.days = days;
+	}
+
+	public Long getScripted() {
+		return scripted;
+	}
+
+	public void setScripted(Long scripted) {
+		this.scripted = scripted;
+	}
+
+	@Override
+	public String toString() {
+		return "TripDto{" +
+				"tripName='" + name + '\'' +
+				", startDate=" + startDate +
+				", endDate=" + endDate +
+				", days=" + days +
+				", scripted=" + scripted +
+				", isCompleted=" + isCompleted +
+				", countries=" + countries +
+				'}';
+	}
 }

@@ -1,8 +1,9 @@
 package com.sharavel.sharavel_be.dto;
 
-import com.sharavel.sharavel_be.entity.UserEntity;
+import com.sharavel.sharavel_be.entity.Users;
 
 public class UserProfileDto {
+	private String id;
 	private String name;
 	private String username;
 	private String email;
@@ -10,13 +11,22 @@ public class UserProfileDto {
 	private String state;
 	private String city;
 
-	public UserProfileDto(UserEntity user) {
+	public UserProfileDto(Users user) {
+		this.id = user.getUuid();
 		this.name = user.getName();
 		this.username = user.getUsername();
 		this.email = user.getEmail();
 		this.country = user.getCountry();
 		this.state = user.getState();
 		this.city = user.getCity();
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	public String getName() {

@@ -8,7 +8,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.sharavel.sharavel_be.entity.UserEntity;
+import com.sharavel.sharavel_be.entity.Users;
 
 public class CustomUserDetails implements UserDetails {
 	final private String name;
@@ -17,7 +17,7 @@ public class CustomUserDetails implements UserDetails {
 	final private String password;
 	private final Collection<? extends GrantedAuthority> authorities;
 
-	public CustomUserDetails(UserEntity userInfo) {
+	public CustomUserDetails(Users userInfo) {
 		this.name = userInfo.getName();
 		this.email = userInfo.getEmail();
 		this.password = userInfo.getPassword();

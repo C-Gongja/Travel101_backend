@@ -2,7 +2,7 @@ package com.sharavel.sharavel_be.service;
 
 import org.springframework.stereotype.Service;
 
-import com.sharavel.sharavel_be.entity.RoleEntity;
+import com.sharavel.sharavel_be.entity.Roles;
 import com.sharavel.sharavel_be.repository.RoleRepo;
 import com.sharavel.sharavel_be.util.RoleConstants;
 
@@ -20,13 +20,13 @@ public class DataInitializer {
 	public void init() {
 		// USER 역할 초기화
 		if (!roleRepository.findByName(RoleConstants.ROLE_USER).isPresent()) {
-			RoleEntity userRole = new RoleEntity();
+			Roles userRole = new Roles();
 			userRole.setName(RoleConstants.ROLE_USER);
 			roleRepository.save(userRole);
 		}
 		// ADMIN 역할 초기화
 		if (!roleRepository.findByName(RoleConstants.ROLE_ADMIN).isPresent()) {
-			RoleEntity adminRole = new RoleEntity();
+			Roles adminRole = new Roles();
 			adminRole.setName(RoleConstants.ROLE_ADMIN);
 			roleRepository.save(adminRole);
 		}

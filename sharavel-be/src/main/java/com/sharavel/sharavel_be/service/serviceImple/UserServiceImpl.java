@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.sharavel.sharavel_be.dto.AuthDto;
 import com.sharavel.sharavel_be.dto.UserProfileDto;
-import com.sharavel.sharavel_be.entity.UserEntity;
+import com.sharavel.sharavel_be.entity.Users;
 import com.sharavel.sharavel_be.repository.UserRepo;
 import com.sharavel.sharavel_be.security.CustomUserDetails;
 import com.sharavel.sharavel_be.security.util.JwtUtil;
@@ -35,7 +35,7 @@ public class UserServiceImpl implements UserService {
 		}
 		// 인증된 유저 정보
 		String email = authentication.getName();
-		UserEntity user = userRepository.findByEmail(email)
+		Users user = userRepository.findByEmail(email)
 				.orElseThrow(() -> new IllegalStateException("User not found"));
 		CustomUserDetails userDetails = new CustomUserDetails(user);
 
@@ -49,7 +49,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public UserProfileDto getProfile(String email) {
-		UserEntity user = userRepository.findByEmail(email)
+		Users user = userRepository.findByEmail(email)
 				.orElseThrow(() -> new RuntimeException("User not found"));
 
 		return new UserProfileDto(user);
