@@ -15,7 +15,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sharavel.sharavel_be.security.util.JwtUtil;
-import com.sharavel.sharavel_be.service.CustomUserDetailsService;
+import com.sharavel.sharavel_be.user.service.CustomUserDetailsService;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;

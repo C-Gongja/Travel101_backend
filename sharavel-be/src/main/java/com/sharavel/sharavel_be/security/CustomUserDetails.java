@@ -8,9 +8,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.sharavel.sharavel_be.entity.Users;
+import com.sharavel.sharavel_be.user.entity.Users;
 
 public class CustomUserDetails implements UserDetails {
+	final private String uuid;
 	final private String name;
 	final private String email; // Changed from 'name' to 'username' for clarity
 	@JsonIgnore
@@ -18,6 +19,7 @@ public class CustomUserDetails implements UserDetails {
 	private final Collection<? extends GrantedAuthority> authorities;
 
 	public CustomUserDetails(Users userInfo) {
+		this.uuid = userInfo.getUuid();
 		this.name = userInfo.getName();
 		this.email = userInfo.getEmail();
 		this.password = userInfo.getPassword();
@@ -29,6 +31,10 @@ public class CustomUserDetails implements UserDetails {
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return authorities;
+	}
+
+	public String getUuid() {
+		return uuid;
 	}
 
 	public String getName() {
