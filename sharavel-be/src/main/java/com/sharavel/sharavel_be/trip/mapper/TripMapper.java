@@ -16,7 +16,7 @@ import com.sharavel.sharavel_be.trip.entity.Trip;
 public class TripMapper {
 	public TripDto mapToTripDto(Trip trip) {
 		TripDto tripDto = new TripDto();
-		tripDto.setId(trip.getUuid()); // Use UUID as the identifier instead of internal ID
+		tripDto.setUuid(trip.getUuid()); // Use UUID as the identifier instead of internal ID
 		tripDto.setName(trip.getName());
 		tripDto.setStartDate(trip.getStartDate());
 		tripDto.setEndDate(trip.getEndDate());
@@ -51,6 +51,7 @@ public class TripMapper {
 		TripListDto tripListDto = new TripListDto();
 		tripListDto.setId(trip.getUuid());
 		tripListDto.setName(trip.getName());
+		tripListDto.setUsername(trip.getUid().getUsername());
 		tripListDto.setStartDate(trip.getStartDate());
 		tripListDto.setEndDate(trip.getEndDate());
 		tripListDto.setCountries(trip.getCountries());

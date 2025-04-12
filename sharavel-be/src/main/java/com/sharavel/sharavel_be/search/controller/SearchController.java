@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sharavel.sharavel_be.search.dto.SearchDto;
 import com.sharavel.sharavel_be.search.service.SearchRepositoryCustom;
+import com.sharavel.sharavel_be.trip.dto.TripListDto;
 
 @RestController
 @RequestMapping("/public")
@@ -20,7 +20,8 @@ public class SearchController {
 	}
 
 	@GetMapping("/search")
-	public List<SearchDto> search(@RequestParam String keyword) {
+	public List<TripListDto> search(@RequestParam String keyword) {
+		
 		return searchRepository.searchAll(keyword);
 	}
 }

@@ -2,6 +2,7 @@ package com.sharavel.sharavel_be.auth.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -46,6 +47,21 @@ public class AuthController {
 		} catch (BadCredentialsException ex) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Login failed");
 		}
+	}
+
+	@PostMapping("/logout")
+	public ResponseEntity<?> logout(HttpServletResponse response) {
+		// 쿠키 삭제 (만료 시간 과거로 설정)
+		ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "")
+				.httpOnly(true)
+				.secure(true)
+				.path("/")
+				.maxAge(0)
+				.build();
+
+		response.setHeader("Set-Cookie", deleteCookie.toString());
+
+		return ResponseEntity.ok("Logged out successfully");
 	}
 
 	@PostMapping("/refresh")

@@ -55,7 +55,7 @@ public class Trip {
 	@Column(nullable = false)
 	private Long scripted;
 
-	@Column(nullable = true)
+	@Column(columnDefinition = "text[]", nullable = true)
 	private List<String> countries;
 
 	@CreationTimestamp

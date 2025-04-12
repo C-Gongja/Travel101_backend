@@ -23,7 +23,7 @@ public interface TripService {
 
 	public TripDto putUpdatedTrip(String tripuuid, TripDto updatedTrip);
 
-	public ResponseEntity<?> deleteTrip(String tripUuid); 
+	public ResponseEntity<?> deleteTrip(String tripUuid);
 
 	@Transactional
 	public TripDto updateTripField(String tripUuid, Map<String, Object> updates);

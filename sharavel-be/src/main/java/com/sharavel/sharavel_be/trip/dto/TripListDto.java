@@ -6,12 +6,24 @@ import java.util.List;
 public class TripListDto {
 	private String id;
 	private String name;
+	private String username;
 	private Date startDate;
 	private Date endDate;
 	private List<String> countries;
 	private Long scripted;
 
 	public TripListDto() {
+	}
+
+	public TripListDto(String id, String name, String username, Date startDate, Date endDate, List<String> countries,
+			Long scripted) {
+		this.id = id;
+		this.username = username;
+		this.name = name;
+		this.startDate = startDate;
+		this.endDate = endDate;
+		this.countries = countries;
+		this.scripted = scripted;
 	}
 
 	// get trip uuid
@@ -29,6 +41,14 @@ public class TripListDto {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
 	public Date getStartDate() {
@@ -66,7 +86,8 @@ public class TripListDto {
 	@Override
 	public String toString() {
 		return "TripDto{" +
-				"tripName='" + name + '\'' +
+				"username='" + username + '\'' +
+				"tripName=" + name +
 				", startDate=" + startDate +
 				", endDate=" + endDate +
 				", scripted=" + scripted +

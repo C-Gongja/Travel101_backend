@@ -126,14 +126,19 @@ public class TripServiceImpl implements TripService {
 	public TripResponse getTripByUuid(String tripUuid) {
 		Trip trip = tripRepository.findByUuid(tripUuid)
 				.orElseThrow(() -> new RuntimeException("Trip not found"));
+		boolean isEditable = false;
+		Users currentUser = null;
 
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		String email = authentication.getName();
-		Users user = userRepository.findByEmail(email)
-				.orElseThrow(() -> new IllegalStateException("User not found"));
-
-		boolean isEditable = user != null && trip.getUid().equals(user);
-
+		if (authentication != null && authentication.isAuthenticated()
+				&& !"anonymousUser".equals(authentication.getName())) {
+			String email = authentication.getName();
+			currentUser = userRepository.findByEmail(email)
+					.orElse(null);
+		}
+		if (currentUser != null && trip.getUid().equals(currentUser)) {
+			isEditable = true;
+		}
 		TripResponse response = new TripResponse(tripMapper.mapToTripDto(trip), isEditable);
 
 		return response;
@@ -141,16 +146,9 @@ public class TripServiceImpl implements TripService {
 
 	@Override
 	public List<TripListDto> getAllTrips() {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		String email = authentication.getName();
-		Users user = userRepository.findByEmail(email)
-				.orElseThrow(() -> new IllegalStateException("User not found"));
-
 		List<Trip> allTrips = tripRepository.findAll(); // Trip 엔티티를 가져왔다고 가정
-		System.out.println("All trips: " + allTrips);
 
 		List<TripListDto> filteredTrips = allTrips.stream()
-				.filter(trip -> !trip.getUid().equals(user))
 				.map(trip -> (TripListDto) tripMapper.mapToTripListDto(trip))
 				.collect(Collectors.toList());
 
