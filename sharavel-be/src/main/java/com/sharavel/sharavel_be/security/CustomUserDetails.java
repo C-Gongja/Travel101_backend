@@ -14,6 +14,7 @@ public class CustomUserDetails implements UserDetails {
 	final private String uuid;
 	final private String name;
 	final private String email; // Changed from 'name' to 'username' for clarity
+	final private String picture;
 	@JsonIgnore
 	final private String password;
 	private final Collection<? extends GrantedAuthority> authorities;
@@ -22,6 +23,7 @@ public class CustomUserDetails implements UserDetails {
 		this.uuid = userInfo.getUuid();
 		this.name = userInfo.getName();
 		this.email = userInfo.getEmail();
+		this.picture = userInfo.getPicture();
 		this.password = userInfo.getPassword();
 		this.authorities = userInfo.getRoles().stream()
 				.map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
@@ -39,6 +41,10 @@ public class CustomUserDetails implements UserDetails {
 
 	public String getName() {
 		return name;
+	}
+
+	public String getPicture() {
+		return picture;
 	}
 
 	// getUsername(): email을 반환 → Authentication의 getName()이 이를 반영.

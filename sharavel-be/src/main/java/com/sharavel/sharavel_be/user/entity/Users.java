@@ -37,6 +37,12 @@ public class Users {
 	@Column(nullable = false, unique = true, updatable = false)
 	private String uuid;
 
+	@Column(nullable = true)
+	private String provider;
+
+	@Column(nullable = true)
+	private String providerId;
+
 	@Column(nullable = false)
 	private String name;
 
@@ -46,8 +52,11 @@ public class Users {
 	@Column(unique = true, length = 100, nullable = false)
 	private String email;
 
-	@Column(nullable = false)
+	@Column(nullable = true)
 	private String password;
+
+	@Column(nullable = true)
+	private String picture;
 
 	@Column(nullable = true)
 	private String country;
@@ -87,6 +96,22 @@ public class Users {
 
 	public void setUuid(String uuid) {
 		this.uuid = uuid;
+	}
+
+	public String getProvider() {
+		return provider;
+	}
+
+	public void setProvider(String provider) {
+		this.provider = provider;
+	}
+
+	public String getProviderId() {
+		return providerId;
+	}
+
+	public void setProviderId(String providerId) {
+		this.providerId = providerId;
 	}
 
 	@PrePersist
@@ -182,5 +207,13 @@ public class Users {
 
 	public void setTrips(List<Trip> trips) {
 		this.trips = trips;
+	}
+
+	public String getPicture() {
+		return picture;
+	}
+
+	public void setPicture(String picture) {
+		this.picture = picture;
 	}
 }
