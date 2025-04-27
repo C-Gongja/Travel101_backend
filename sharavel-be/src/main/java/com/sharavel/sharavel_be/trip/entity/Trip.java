@@ -30,7 +30,7 @@ public class Trip {
 	private Long id;
 
 	@Column(nullable = false, unique = true, updatable = false)
-	private String uuid;
+	private String tripUid;
 
 	@ManyToOne
 	@JoinColumn(name = "user_id", nullable = false)
@@ -74,18 +74,18 @@ public class Trip {
 		this.id = id;
 	}
 
-	public String getUuid() {
-		return uuid;
+	public String getTripUid() {
+		return tripUid;
 	}
 
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
+	public void setTripUid(String tripUid) {
+		this.tripUid = tripUid;
 	}
 
 	@PrePersist
 	public void generateUUID() {
-		if (this.uuid == null) {
-			this.uuid = UUID.randomUUID().toString(); // UUID 자동 생성
+		if (this.tripUid == null) {
+			this.tripUid = UUID.randomUUID().toString(); // UUID 자동 생성
 		}
 	}
 

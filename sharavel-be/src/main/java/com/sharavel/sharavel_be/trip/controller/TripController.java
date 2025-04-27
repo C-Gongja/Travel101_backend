@@ -29,7 +29,7 @@ public class TripController {
 	@PostMapping("/post")
 	public ResponseEntity<Map<String, Object>> createTrip(@RequestBody TripDto trip) {
 		TripDto savedTrip = tripService.createTrip(trip);
-		String redirectUrl = "/trip/" + savedTrip.getUuid();
+		String redirectUrl = "/trip/" + savedTrip.getTripUid();
 
 		Map<String, Object> response = new HashMap<>();
 		response.put("trip", savedTrip);
@@ -39,9 +39,9 @@ public class TripController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
-	@GetMapping("/{tripUuid}")
-	public ResponseEntity<TripResponse> getTrip(@PathVariable String tripUuid) {
-		TripResponse tripResponse = tripService.getTripByUuid(tripUuid);
+	@GetMapping("/{tripUid}")
+	public ResponseEntity<TripResponse> getTrip(@PathVariable String tripUid) {
+		TripResponse tripResponse = tripService.getTripByUuid(tripUid);
 
 		if (tripResponse == null) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -50,32 +50,32 @@ public class TripController {
 		return ResponseEntity.ok(tripResponse);
 	}
 
-	@PostMapping("/scriptTrip/{tripUuid}")
-	public ResponseEntity<?> scriptTrip(@PathVariable String tripUuid) {
-		tripService.scriptTrip(tripUuid);
+	@PostMapping("/scriptTrip/{tripUid}")
+	public ResponseEntity<?> scriptTrip(@PathVariable String tripUid) {
+		tripService.scriptTrip(tripUid);
 		return ResponseEntity.ok("Successfully scripted!");
 	}
 
-	@PutMapping("/{tripUuid}")
+	@PutMapping("/{tripUid}")
 	public ResponseEntity<TripDto> putTripField(
-			@PathVariable String tripUuid,
+			@PathVariable String tripUid,
 			@RequestBody TripDto updates) {
-		TripDto updatedTrip = tripService.putUpdatedTrip(tripUuid, updates);
+		TripDto updatedTrip = tripService.putUpdatedTrip(tripUid, updates);
 		return ResponseEntity.ok(updatedTrip);
 	}
 
-	@PatchMapping("/{tripUuid}")
+	@PatchMapping("/{tripUid}")
 	public ResponseEntity<TripDto> updateTripField(
-			@PathVariable String tripUuid,
+			@PathVariable String tripUid,
 			@RequestBody Map<String, Object> updates) {
 
-		TripDto updatedTrip = tripService.updateTripField(tripUuid, updates);
+		TripDto updatedTrip = tripService.updateTripField(tripUid, updates);
 		return ResponseEntity.ok(updatedTrip);
 	}
 
-	@DeleteMapping("/delete/{tripUuid}")
-	public ResponseEntity<?> deleteTrip(@PathVariable String tripUuid) {
-		tripService.deleteTrip(tripUuid);
+	@DeleteMapping("/delete/{tripUid}")
+	public ResponseEntity<?> deleteTrip(@PathVariable String tripUid) {
+		tripService.deleteTrip(tripUid);
 		return ResponseEntity.ok("Successfully Deleted");
 	}
 }

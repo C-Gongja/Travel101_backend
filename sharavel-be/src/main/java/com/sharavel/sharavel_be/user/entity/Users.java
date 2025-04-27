@@ -10,6 +10,7 @@ import java.util.UUID;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.sharavel.sharavel_be.follow.entity.UserFollow;
 import com.sharavel.sharavel_be.trip.entity.Trip;
 
 import jakarta.persistence.CascadeType;
@@ -66,6 +67,12 @@ public class Users {
 
 	@Column(nullable = true)
 	private String city;
+
+	@OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<UserFollow> followers = new HashSet<>();
+
+	@OneToMany(mappedBy = "following", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<UserFollow> following = new HashSet<>();
 
 	@OneToMany(mappedBy = "uid", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Trip> trips = new ArrayList<>();
@@ -215,5 +222,21 @@ public class Users {
 
 	public void setPicture(String picture) {
 		this.picture = picture;
+	}
+
+	public Set<UserFollow> getFollowers() {
+		return followers;
+	}
+
+	public void setFollowers(Set<UserFollow> followers) {
+		this.followers = followers;
+	}
+
+	public Set<UserFollow> getFollowing() {
+		return following;
+	}
+
+	public void setFollowing(Set<UserFollow> following) {
+		this.following = following;
 	}
 }

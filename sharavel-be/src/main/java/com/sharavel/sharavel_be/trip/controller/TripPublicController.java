@@ -42,9 +42,9 @@ public class TripPublicController {
 		return ResponseEntity.ok(trips);
 	}
 
-	@GetMapping("/{tripUuid}")
-	public ResponseEntity<TripResponse> getTrip(@PathVariable String tripUuid) {
-		TripResponse tripResponse = tripService.getTripByUuid(tripUuid);
+	@GetMapping("/{tripUid}")
+	public ResponseEntity<TripResponse> getTrip(@PathVariable String tripUid) {
+		TripResponse tripResponse = tripService.getTripByUuid(tripUid);
 
 		if (tripResponse == null) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

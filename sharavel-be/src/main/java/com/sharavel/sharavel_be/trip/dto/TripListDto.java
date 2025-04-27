@@ -4,7 +4,7 @@ import java.sql.Date;
 import java.util.List;
 
 public class TripListDto {
-	private String id;
+	private String tripUid;
 	private String name;
 	private String username;
 	private Date startDate;
@@ -15,9 +15,9 @@ public class TripListDto {
 	public TripListDto() {
 	}
 
-	public TripListDto(String id, String name, String username, Date startDate, Date endDate, List<String> countries,
+	public TripListDto(String tripUid, String name, String username, Date startDate, Date endDate, List<String> countries,
 			Long scripted) {
-		this.id = id;
+		this.tripUid = tripUid;
 		this.username = username;
 		this.name = name;
 		this.startDate = startDate;
@@ -27,12 +27,12 @@ public class TripListDto {
 	}
 
 	// get trip uuid
-	public String getId() {
-		return id;
+	public String getTripUid() {
+		return tripUid;
 	}
 
-	public void setId(String id) {
-		this.id = id;
+	public void setTripUid(String tripUid) {
+		this.tripUid = tripUid;
 	}
 
 	public String getName() {

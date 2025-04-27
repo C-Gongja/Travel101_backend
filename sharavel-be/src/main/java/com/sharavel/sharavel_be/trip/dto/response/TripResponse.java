@@ -1,15 +1,18 @@
 package com.sharavel.sharavel_be.trip.dto.response;
 
 import com.sharavel.sharavel_be.trip.dto.TripDto;
+import com.sharavel.sharavel_be.user.dto.UserSnippetDto;
 
 public class TripResponse {
 	private TripDto trip;
 	private boolean isEditable;
+	private UserSnippetDto userSnippet;
 
 	// 생성자
-	public TripResponse(TripDto trip, boolean isEditable) {
+	public TripResponse(TripDto trip, boolean isEditable, UserSnippetDto userSnippet) {
 		this.trip = trip;
 		this.isEditable = isEditable;
+		this.userSnippet = userSnippet;
 	}
 
 	// getter, setter
@@ -27,5 +30,13 @@ public class TripResponse {
 
 	public void setEditable(boolean editable) {
 		isEditable = editable;
+	}
+
+	public UserSnippetDto getUserSnippet() {
+		return userSnippet;
+	}
+
+	public void setUserSnippet(UserSnippetDto userSnippet) {
+		this.userSnippet = userSnippet;
 	}
 }

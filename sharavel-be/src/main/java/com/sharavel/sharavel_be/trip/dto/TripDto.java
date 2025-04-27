@@ -4,7 +4,7 @@ import java.sql.Date;
 import java.util.List;
 
 public class TripDto {
-	private String uuid;
+	private String tripUid;
 	private String name;
 	private Date startDate;
 	private Date endDate;
@@ -17,12 +17,12 @@ public class TripDto {
 	}
 
 	// get trip uuid
-	public String getUuid() {
-		return uuid;
+	public String getTripUid() {
+		return tripUid;
 	}
 
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
+	public void setTripUid(String tripUid) {
+		this.tripUid = tripUid;
 	}
 
 	public String getName() {

@@ -36,7 +36,7 @@ public class SearchRepositoryImpl implements SearchRepositoryCustom {
 
 		return queryFactory
 				.select(Projections.constructor(TripListDto.class,
-						trip.uuid,
+						trip.uid,
 						trip.name,
 						user.username,
 						trip.startDate,

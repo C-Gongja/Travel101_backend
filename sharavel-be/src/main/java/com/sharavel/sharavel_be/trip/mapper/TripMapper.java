@@ -16,7 +16,7 @@ import com.sharavel.sharavel_be.trip.entity.Trip;
 public class TripMapper {
 	public TripDto mapToTripDto(Trip trip) {
 		TripDto tripDto = new TripDto();
-		tripDto.setUuid(trip.getUuid()); // Use UUID as the identifier instead of internal ID
+		tripDto.setTripUid(trip.getTripUid()); // Use UUID as the identifier instead of internal ID
 		tripDto.setName(trip.getName());
 		tripDto.setStartDate(trip.getStartDate());
 		tripDto.setEndDate(trip.getEndDate());
@@ -49,7 +49,7 @@ public class TripMapper {
 
 	public TripListDto mapToTripListDto(Trip trip) {
 		TripListDto tripListDto = new TripListDto();
-		tripListDto.setId(trip.getUuid());
+		tripListDto.setTripUid(trip.getTripUid());
 		tripListDto.setName(trip.getName());
 		tripListDto.setUsername(trip.getUid().getUsername());
 		tripListDto.setStartDate(trip.getStartDate());
@@ -58,12 +58,12 @@ public class TripMapper {
 		tripListDto.setScripted(trip.getScripted());
 		return tripListDto;
 		// return trips.stream().map(trip -> new TripListDto(
-		// 		trip.getUuid(), // UUID 사용
-		// 		trip.getName(),
-		// 		trip.getStartDate(),
-		// 		trip.getEndDate(),
-		// 		trip.getCountries(),
-		// 		trip.getScripted()))
-		// 		.collect(Collectors.toList());
+		// trip.getUuid(), // UUID 사용
+		// trip.getName(),
+		// trip.getStartDate(),
+		// trip.getEndDate(),
+		// trip.getCountries(),
+		// trip.getScripted()))
+		// .collect(Collectors.toList());
 	}
 }

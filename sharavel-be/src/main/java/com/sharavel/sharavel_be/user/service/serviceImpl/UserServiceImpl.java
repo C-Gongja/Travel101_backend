@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
 		// 인증된 유저 정보
 		String email = authentication.getName();
 		Users user = userRepository.findByEmail(email)
-				.orElseThrow(() -> new IllegalStateException("User not found"));
+				.orElseThrow(() -> new IllegalStateException("Verify User not found"));
 		CustomUserDetails userDetails = new CustomUserDetails(user);
 
 		// 새 accessToken 발급
@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public UserProfileDto getProfile(String userUuid) {
 		Users user = userRepository.findByUuid(userUuid)
-				.orElseThrow(() -> new RuntimeException("User not found"));
+				.orElseThrow(() -> new RuntimeException("GetProfile User not found"));
 
 		return new UserProfileDto(user);
 	}

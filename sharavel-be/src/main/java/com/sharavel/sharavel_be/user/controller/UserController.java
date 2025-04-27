@@ -26,10 +26,6 @@ public class UserController {
 	@GetMapping("/profile/{userUuid}")
 	public ResponseEntity<?> userProfile(@PathVariable String userUuid) {
 		try {
-			// Authentication authentication =
-			// SecurityContextHolder.getContext().getAuthentication();
-			// String email = authentication.getName();
-			// System.out.println("email: "+ email);
 			UserProfileDto user = userService.getProfile(userUuid);
 
 			return ResponseEntity.ok(user);
