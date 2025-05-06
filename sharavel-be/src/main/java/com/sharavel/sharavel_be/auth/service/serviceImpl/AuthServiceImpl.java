@@ -46,17 +46,19 @@ public class AuthServiceImpl implements AuthService {
 					.body(("Email is already taken"));
 		}
 
-		Users user = new Users();
-		user.setName(request.getName());
-		user.setEmail(request.getEmail());
-		user.setPassword(passwordEncoder.encode(request.getPassword()));
-		user.setCreatedAt(LocalDateTime.now());
+		Users newUser = new Users();
+		newUser.setName(request.getName());
+		newUser.setEmail(request.getEmail());
+		newUser.setPassword(passwordEncoder.encode(request.getPassword()));
+		newUser.setTotalTripDays(0);
+		newUser.setTotalTrips(0);
+		newUser.setCreatedAt(LocalDateTime.now());
 
 		Roles userRole = roleRepository.findByName(RoleConstants.ROLE_USER)
 				.orElseThrow(() -> new IllegalStateException("USER role Internal Error"));
-		user.setRoles(Collections.singleton(userRole));
+		newUser.setRoles(Collections.singleton(userRole));
 
-		Users savedUser = userRepository.save(user);
+		Users savedUser = userRepository.save(newUser);
 
 		CustomUserDetails userDetails = new CustomUserDetails(savedUser);
 

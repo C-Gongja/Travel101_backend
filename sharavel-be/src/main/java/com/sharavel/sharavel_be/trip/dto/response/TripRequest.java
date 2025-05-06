@@ -1,24 +1,25 @@
-package com.sharavel.sharavel_be.trip.dto;
+package com.sharavel.sharavel_be.trip.dto.response;
 
 import java.sql.Date;
 import java.util.List;
 
-import com.sharavel.sharavel_be.countries.dto.CountryDto;
+import com.sharavel.sharavel_be.countries.dto.CountryCodeDto;
+import com.sharavel.sharavel_be.trip.dto.DaysDto;
 
-public class TripDto {
+public class TripRequest {
 	private String tripUid;
 	private String name;
 	private Date startDate;
 	private Date endDate;
 	private boolean isCompleted;
 	private Long scripted;
-	private List<CountryDto> countries;
+	private List<CountryCodeDto> countries; // iso2만 보냄
 	private List<DaysDto> days;
 
-	public TripDto() {
+	public TripRequest() {
+
 	}
 
-	// get trip uuid
 	public String getTripUid() {
 		return tripUid;
 	}
@@ -59,11 +60,19 @@ public class TripDto {
 		this.isCompleted = isCompleted;
 	}
 
-	public List<CountryDto> getCountries() {
+	public Long getScripted() {
+		return scripted;
+	}
+
+	public void setScripted(Long scripted) {
+		this.scripted = scripted;
+	}
+
+	public List<CountryCodeDto> getCountries() {
 		return countries;
 	}
 
-	public void setCountries(List<CountryDto> countries) {
+	public void setCountries(List<CountryCodeDto> countries) {
 		this.countries = countries;
 	}
 
@@ -75,24 +84,18 @@ public class TripDto {
 		this.days = days;
 	}
 
-	public Long getScripted() {
-		return scripted;
-	}
-
-	public void setScripted(Long scripted) {
-		this.scripted = scripted;
-	}
-
 	@Override
 	public String toString() {
 		return "TripDto{" +
-				"tripName='" + name + '\'' +
+				"tripUid='" + tripUid + '\'' +
+				", name='" + name + '\'' +
 				", startDate=" + startDate +
 				", endDate=" + endDate +
-				", days=" + days +
-				", scripted=" + scripted +
 				", isCompleted=" + isCompleted +
+				", scripted=" + scripted +
 				", countries=" + countries +
+				", days=" + days +
 				'}';
 	}
+
 }

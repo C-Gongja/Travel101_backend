@@ -1,7 +1,7 @@
 package com.sharavel.sharavel_be.search.dto;
 
 public class SearchDto {
-	private String tripUuId;
+	private String tripUid;
 	private String tripName;
 	private String username;
 	private String locationName;
@@ -10,9 +10,9 @@ public class SearchDto {
 	// private String tagName;
 
 	// 생성자, getter, setter
-	public SearchDto(String tripUuId, String tripName, String username,
+	public SearchDto(String tripUid, String tripName, String username,
 			String locationName, String locationDescription) {
-		this.tripUuId = tripUuId;
+		this.tripUid = tripUid;
 		this.tripName = tripName;
 		this.username = username;
 		this.locationName = locationName;
@@ -20,11 +20,11 @@ public class SearchDto {
 	}
 
 	public String getTripId() {
-		return tripUuId;
+		return tripUid;
 	}
 
-	public void setTripId(String tripUuId) {
-		this.tripUuId = tripUuId;
+	public void setTripId(String tripUid) {
+		this.tripUid = tripUid;
 	}
 
 	public String getTripName() {

@@ -7,15 +7,11 @@ import org.springframework.http.ResponseEntity;
 import com.sharavel.sharavel_be.user.entity.Users;
 
 public interface UserFollowService {
-	public ResponseEntity<?> followUser(String userId);
+	public ResponseEntity<?> followUser(String followingId);
 
-	public ResponseEntity<?> unfollowUser(String userId);
+	public ResponseEntity<?> unfollowUser(String unFollowId);
 
-	public Long getFollowingCount(Long userId);
+	public Long getFollowingCount(String userId);
 
-	public Long getFollowersCount(Long userId);
-
-	public List<Users> getFollowing(Long userId);
-
-	public List<Users> getFollowers(Long userId);
+	public Long getFollowersCount(String userId);
 }

@@ -53,6 +53,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 					newUser.setPicture(picture);
 					newUser.setProvider("google");
 					newUser.setProviderId(providerId);
+					newUser.setTotalTripDays(0);
+					newUser.setTotalTrips(0);
 					newUser.setCreatedAt(LocalDateTime.now());
 
 					Roles userRole = roleRepository.findByName(RoleConstants.ROLE_USER)

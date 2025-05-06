@@ -17,6 +17,8 @@ import com.sharavel.sharavel_be.follow.service.UserFollowService;
 import com.sharavel.sharavel_be.user.entity.Users;
 import com.sharavel.sharavel_be.user.repository.UserRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class UserFollowServiceImpl implements UserFollowService {
 
@@ -37,9 +39,9 @@ public class UserFollowServiceImpl implements UserFollowService {
 	}
 
 	@Override
-	public ResponseEntity<?> followUser(String userId) {
+	public ResponseEntity<?> followUser(String followingId) {
 		Users currentUser = getCurrentUser();
-		Users followedUser = userRepository.findByUuid(userId)
+		Users followedUser = userRepository.findByUuid(followingId)
 				.orElseThrow(() -> new RuntimeException("User not found"));
 
 		if (currentUser.equals(followedUser)) {
@@ -62,9 +64,10 @@ public class UserFollowServiceImpl implements UserFollowService {
 	}
 
 	@Override
-	public ResponseEntity<?> unfollowUser(String userId) {
+	@Transactional
+	public ResponseEntity<?> unfollowUser(String unFollowId) {
 		Users currentUser = getCurrentUser();
-		Users unfollowedUser = userRepository.findByUuid(userId)
+		Users unfollowedUser = userRepository.findByUuid(unFollowId)
 				.orElseThrow(() -> new RuntimeException("User not found"));
 
 		if (currentUser.equals(unfollowedUser)) {
@@ -72,36 +75,24 @@ public class UserFollowServiceImpl implements UserFollowService {
 					.body("You cannot unfollow yourself");
 		}
 
-		Optional<UserFollow> existingFollow = userFollowRepository.findByFollowerAndFollowing(currentUser, unfollowedUser);
-
-		if (existingFollow.isPresent()) {
-			userFollowRepository.delete(existingFollow.get());
+		try {
+			userFollowRepository.deleteByFollowerAndFollowing(currentUser, unfollowedUser);
 			return ResponseEntity.ok("Unfollowed the user");
-		} else {
-			return ResponseEntity.ok("You are not following this user");
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body("Failed to unfollow the user: " + e.getMessage());
 		}
 	}
 
 	@Override
-	public Long getFollowingCount(Long userId) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'getFollowingCount'");
+	public Long getFollowingCount(String userId) {
+		Users user = userRepository.findByUuid(userId).orElseThrow(() -> new RuntimeException("User not found"));
+		return userFollowRepository.countByFollowing_Id(user.getId());
 	}
 
 	@Override
-	public Long getFollowersCount(Long userId) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'getFollowersCount'");
-	}
-
-	@Override
-	public List<Users> getFollowing(Long userId) {
-		throw new UnsupportedOperationException("Unimplemented method 'getFollowers'");
-	}
-
-	@Override
-	public List<Users> getFollowers(Long userId) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'getFollowers'");
+	public Long getFollowersCount(String userId) {
+		Users user = userRepository.findByUuid(userId).orElseThrow(() -> new RuntimeException("User not found"));
+		return userFollowRepository.countByFollower_Id(user.getId());
 	}
 }

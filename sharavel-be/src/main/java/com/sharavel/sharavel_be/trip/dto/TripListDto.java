@@ -3,30 +3,34 @@ package com.sharavel.sharavel_be.trip.dto;
 import java.sql.Date;
 import java.util.List;
 
+import com.sharavel.sharavel_be.countries.dto.CountryDto;
+
 public class TripListDto {
 	private String tripUid;
 	private String name;
 	private String username;
 	private Date startDate;
 	private Date endDate;
-	private List<String> countries;
+	private List<CountryDto> countries;
+	private boolean isCompleted;
 	private Long scripted;
 
 	public TripListDto() {
 	}
 
-	public TripListDto(String tripUid, String name, String username, Date startDate, Date endDate, List<String> countries,
-			Long scripted) {
+	public TripListDto(String tripUid, String name, String username, Date startDate, Date endDate,
+			List<CountryDto> countries, boolean isCompleted, Long scripted) {
 		this.tripUid = tripUid;
 		this.username = username;
 		this.name = name;
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.countries = countries;
+		this.isCompleted = isCompleted;
 		this.scripted = scripted;
 	}
 
-	// get trip uuid
+	// get trip uid
 	public String getTripUid() {
 		return tripUid;
 	}
@@ -67,11 +71,11 @@ public class TripListDto {
 		this.endDate = endDate;
 	}
 
-	public List<String> getCountries() {
+	public List<CountryDto> getCountries() {
 		return countries;
 	}
 
-	public void setCountries(List<String> countries) {
+	public void setCountries(List<CountryDto> countries) {
 		this.countries = countries;
 	}
 
@@ -81,6 +85,14 @@ public class TripListDto {
 
 	public void setScripted(Long scripted) {
 		this.scripted = scripted;
+	}
+
+	public boolean isIsCompleted() {
+		return isCompleted;
+	}
+
+	public void setIsCompleted(boolean isCompleted) {
+		this.isCompleted = isCompleted;
 	}
 
 	@Override

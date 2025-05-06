@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sharavel.sharavel_be.trip.dto.TripDto;
+import com.sharavel.sharavel_be.trip.dto.response.TripRequest;
 import com.sharavel.sharavel_be.trip.dto.response.TripResponse;
 import com.sharavel.sharavel_be.trip.service.TripService;
 
@@ -27,7 +28,8 @@ public class TripController {
 	private TripService tripService;
 
 	@PostMapping("/post")
-	public ResponseEntity<Map<String, Object>> createTrip(@RequestBody TripDto trip) {
+	public ResponseEntity<Map<String, Object>> createTrip(@RequestBody TripRequest trip) {
+		System.out.println("!!!!!!!!!!trip: " + trip);
 		TripDto savedTrip = tripService.createTrip(trip);
 		String redirectUrl = "/trip/" + savedTrip.getTripUid();
 
@@ -59,7 +61,7 @@ public class TripController {
 	@PutMapping("/{tripUid}")
 	public ResponseEntity<TripDto> putTripField(
 			@PathVariable String tripUid,
-			@RequestBody TripDto updates) {
+			@RequestBody TripRequest updates) {
 		TripDto updatedTrip = tripService.putUpdatedTrip(tripUid, updates);
 		return ResponseEntity.ok(updatedTrip);
 	}

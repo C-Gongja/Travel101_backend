@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -32,10 +33,10 @@ public class UserFollowController {
 
 	// 언팔로우 유저 (팔로우를 제거하는 API)
 	@DeleteMapping("/unfollow")
-	public ResponseEntity<String> unfollowUser(@RequestParam String followingId) {
+	public ResponseEntity<String> unfollowUser(@RequestParam String unFollowId) {
 		try {
 			// 언팔로우 로직 처리
-			userFollowService.unfollowUser(followingId);
+			userFollowService.unfollowUser(unFollowId);
 			return ResponseEntity.ok("Unfollowed successfully");
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to unfollow user");

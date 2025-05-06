@@ -3,6 +3,7 @@ package com.sharavel.sharavel_be.trip.service.serviceImpl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -12,10 +13,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import com.sharavel.sharavel_be.countries.entity.Country;
+import com.sharavel.sharavel_be.countries.repository.CountryRepository;
+import com.sharavel.sharavel_be.follow.repository.UserFollowRepository;
 import com.sharavel.sharavel_be.trip.dto.DaysDto;
 import com.sharavel.sharavel_be.trip.dto.LocationDto;
 import com.sharavel.sharavel_be.trip.dto.TripDto;
 import com.sharavel.sharavel_be.trip.dto.TripListDto;
+import com.sharavel.sharavel_be.trip.dto.response.TripRequest;
 import com.sharavel.sharavel_be.trip.dto.response.TripResponse;
 import com.sharavel.sharavel_be.trip.entity.Days;
 import com.sharavel.sharavel_be.trip.entity.Locations;
@@ -37,10 +42,16 @@ public class TripServiceImpl implements TripService {
 	private UserRepository userRepository;
 
 	@Autowired
+	private UserFollowRepository userFollowRepository;
+
+	@Autowired
+	private CountryRepository countryRepository;
+
+	@Autowired
 	private TripMapper tripMapper;
 
 	@Override
-	public TripDto createTrip(TripDto tripDto) {
+	public TripDto createTrip(TripRequest tripDto) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		if (authentication == null || !authentication.isAuthenticated()) {
 			throw new IllegalStateException("User is not authenticated");
@@ -57,7 +68,6 @@ public class TripServiceImpl implements TripService {
 		trip.setStartDate(tripDto.getStartDate());
 		trip.setEndDate(tripDto.getEndDate());
 		trip.setCompleted(tripDto.isCompleted());
-		trip.setCountries(tripDto.getCountries());
 		trip.setScripted(tripDto.getScripted()); // Default value
 
 		List<Days> days = tripDto.getDays().stream().map(dayDto -> {
@@ -71,7 +81,7 @@ public class TripServiceImpl implements TripService {
 		trip.setDays(days);
 		Trip savedTrip = tripRepository.save(trip);
 
-		return tripMapper.mapToTripDto(savedTrip);
+		return tripMapper.toDto(savedTrip);
 	}
 
 	@Override
@@ -143,10 +153,13 @@ public class TripServiceImpl implements TripService {
 
 		Users tripOwner = userRepository.findByUuid(trip.getUid().getUuid())
 				.orElseThrow(() -> new IllegalStateException("getTripByUuid User not found"));
-		UserSnippetDto userSnippet = new UserSnippetDto(tripOwner.getUuid(), tripOwner.getName(),
-				tripOwner.getUsername());
 
-		TripResponse response = new TripResponse(tripMapper.mapToTripDto(trip), isEditable, userSnippet);
+		boolean isFollowing = userFollowRepository.existsByFollowerIdAndFollowingId(currentUser.getId(), tripOwner.getId());
+
+		UserSnippetDto userSnippet = new UserSnippetDto(tripOwner.getUuid(), tripOwner.getName(),
+				tripOwner.getUsername(), isFollowing);
+
+		TripResponse response = new TripResponse(tripMapper.toDto(trip), isEditable, userSnippet);
 
 		return response;
 	}
@@ -156,7 +169,7 @@ public class TripServiceImpl implements TripService {
 		List<Trip> allTrips = tripRepository.findAll(); // Trip 엔티티를 가져왔다고 가정
 
 		List<TripListDto> filteredTrips = allTrips.stream()
-				.map(trip -> (TripListDto) tripMapper.mapToTripListDto(trip))
+				.map(trip -> (TripListDto) tripMapper.toListDto(trip))
 				.collect(Collectors.toList());
 
 		return filteredTrips;
@@ -170,14 +183,14 @@ public class TripServiceImpl implements TripService {
 		List<Trip> trips = tripRepository.findByUid_Id(uid);
 
 		List<TripListDto> tripsListDto = trips.stream()
-				.map(trip -> (TripListDto) tripMapper.mapToTripListDto(trip))
+				.map(trip -> (TripListDto) tripMapper.toListDto(trip))
 				.collect(Collectors.toList());
 
 		return tripsListDto;
 	}
 
 	@Override
-	public TripDto putUpdatedTrip(String tripUuid, TripDto updatedTrip) {
+	public TripDto putUpdatedTrip(String tripUid, TripRequest updatedTrip) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		if (authentication == null || !authentication.isAuthenticated()) {
 			throw new IllegalStateException("User is not authenticated");
@@ -187,16 +200,21 @@ public class TripServiceImpl implements TripService {
 		Users user = userRepository.findByEmail(email)
 				.orElseThrow(() -> new IllegalStateException("putUpdatedTrip User not found"));
 
-		Trip trip = tripRepository.findByTripUid(tripUuid)
+		Trip trip = tripRepository.findByTripUid(tripUid)
 				.orElseThrow(() -> new RuntimeException("putUpdatedTrip Trip not found"));
 
-		trip.setTripUid(UUID.randomUUID().toString());
+		Set<Country> countries = updatedTrip.getCountries().stream()
+				.map(codeDto -> countryRepository.findByIso2(codeDto.getIso2())
+						.orElseThrow(() -> new RuntimeException("Country not found: " + codeDto.getIso2())))
+				.collect(Collectors.toSet());
+
+		trip.setTripUid(trip.getTripUid());
 		trip.setUid(user);
 		trip.setName(updatedTrip.getName());
 		trip.setStartDate(updatedTrip.getStartDate());
 		trip.setEndDate(updatedTrip.getEndDate());
 		trip.setCompleted(updatedTrip.isCompleted());
-		trip.setCountries(updatedTrip.getCountries());
+		trip.setCountries(countries);
 		trip.setScripted(updatedTrip.getScripted()); // Default value
 
 		Map<Integer, Days> existingDaysMap = trip.getDays().stream()
@@ -239,7 +257,7 @@ public class TripServiceImpl implements TripService {
 		// save
 		Trip savedTrip = tripRepository.save(trip);
 
-		return tripMapper.mapToTripDto(savedTrip);
+		return tripMapper.toDto(savedTrip);
 	}
 
 	@Override

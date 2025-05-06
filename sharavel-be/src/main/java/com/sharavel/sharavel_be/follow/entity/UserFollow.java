@@ -14,6 +14,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
+// add prevent self follow
 @Entity
 @Table(name = "user_followers")
 public class UserFollow {
@@ -37,7 +38,6 @@ public class UserFollow {
 		createdAt = LocalDateTime.now();
 	}
 
-	// Getter, Setter
 	public Long getId() {
 		return id;
 	}

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import com.sharavel.sharavel_be.user.entity.Users;
 
 @Repository
-public interface UserRepository extends JpaRepository<Users, Integer> {
+public interface UserRepository extends JpaRepository<Users, Long> {
 	Optional<Users> findByUsername(String username);
 
 	Optional<Users> findByUuid(String uuid);

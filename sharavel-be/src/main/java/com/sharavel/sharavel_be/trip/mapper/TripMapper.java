@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
+import com.sharavel.sharavel_be.countries.dto.CountryDto;
 import com.sharavel.sharavel_be.trip.dto.DaysDto;
 import com.sharavel.sharavel_be.trip.dto.LocationDto;
 import com.sharavel.sharavel_be.trip.dto.TripDto;
@@ -14,14 +15,17 @@ import com.sharavel.sharavel_be.trip.entity.Trip;
 
 @Component
 public class TripMapper {
-	public TripDto mapToTripDto(Trip trip) {
+	public TripDto toDto(Trip trip) {
 		TripDto tripDto = new TripDto();
 		tripDto.setTripUid(trip.getTripUid()); // Use UUID as the identifier instead of internal ID
 		tripDto.setName(trip.getName());
 		tripDto.setStartDate(trip.getStartDate());
 		tripDto.setEndDate(trip.getEndDate());
 		tripDto.setCompleted(trip.isCompleted());
-		tripDto.setCountries(trip.getCountries());
+		tripDto.setCountries(
+				trip.getCountries().stream()
+						.map(CountryDto::new) // Convert Country to CountryDto using the constructor
+						.collect(Collectors.toList()));
 		tripDto.setScripted(trip.getScripted());
 
 		List<DaysDto> dayDtos = trip.getDays().stream().map(day -> {
@@ -47,23 +51,19 @@ public class TripMapper {
 		return tripDto;
 	}
 
-	public TripListDto mapToTripListDto(Trip trip) {
+	public TripListDto toListDto(Trip trip) {
 		TripListDto tripListDto = new TripListDto();
 		tripListDto.setTripUid(trip.getTripUid());
 		tripListDto.setName(trip.getName());
 		tripListDto.setUsername(trip.getUid().getUsername());
 		tripListDto.setStartDate(trip.getStartDate());
 		tripListDto.setEndDate(trip.getEndDate());
-		tripListDto.setCountries(trip.getCountries());
+		tripListDto.setCountries(
+				trip.getCountries().stream()
+						.map(CountryDto::new) // Convert Country to CountryDto using the constructor
+						.collect(Collectors.toList()));
+		tripListDto.setIsCompleted(trip.isCompleted());
 		tripListDto.setScripted(trip.getScripted());
 		return tripListDto;
-		// return trips.stream().map(trip -> new TripListDto(
-		// trip.getUuid(), // UUID 사용
-		// trip.getName(),
-		// trip.getStartDate(),
-		// trip.getEndDate(),
-		// trip.getCountries(),
-		// trip.getScripted()))
-		// .collect(Collectors.toList());
 	}
 }

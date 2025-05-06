@@ -11,6 +11,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import com.sharavel.sharavel_be.follow.entity.UserFollow;
+import com.sharavel.sharavel_be.socialLink.entity.SocialLink;
 import com.sharavel.sharavel_be.trip.entity.Trip;
 
 import jakarta.persistence.CascadeType;
@@ -53,6 +54,9 @@ public class Users {
 	@Column(unique = true, length = 100, nullable = false)
 	private String email;
 
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<SocialLink> socialLinks = new ArrayList<>();
+
 	@Column(nullable = true)
 	private String password;
 
@@ -62,11 +66,14 @@ public class Users {
 	@Column(nullable = true)
 	private String country;
 
-	@Column(nullable = true)
-	private String state;
+	@Column(nullable = false)
+	private Integer totalTrips;
 
-	@Column(nullable = true)
-	private String city;
+	@Column(nullable = false)
+	private Integer totalTripDays;
+
+	@Column(columnDefinition = "TEXT", nullable = true)
+	private String bio;
 
 	@OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<UserFollow> followers = new HashSet<>();
@@ -152,6 +159,14 @@ public class Users {
 		this.email = email;
 	}
 
+	public List<SocialLink> getSocialLinks() {
+		return socialLinks;
+	}
+
+	public void setSocialLinks(List<SocialLink> socialLinks) {
+		this.socialLinks = socialLinks;
+	}
+
 	public String getPassword() {
 		return password;
 	}
@@ -192,28 +207,28 @@ public class Users {
 		this.country = country;
 	}
 
-	public String getState() {
-		return state;
-	}
-
-	public void setState(String state) {
-		this.state = state;
-	}
-
-	public String getCity() {
-		return city;
-	}
-
-	public void setCity(String city) {
-		this.city = city;
-	}
-
 	public List<Trip> getTrips() {
 		return trips;
 	}
 
 	public void setTrips(List<Trip> trips) {
 		this.trips = trips;
+	}
+
+	public Integer getTotalTrips() {
+		return totalTrips;
+	}
+
+	public void setTotalTrips(Integer totalTrips) {
+		this.totalTrips = totalTrips;
+	}
+
+	public Integer getTotalTripDays() {
+		return totalTripDays;
+	}
+
+	public void setTotalTripDays(Integer totalTripDays) {
+		this.totalTripDays = totalTripDays;
 	}
 
 	public String getPicture() {
@@ -238,5 +253,13 @@ public class Users {
 
 	public void setFollowing(Set<UserFollow> following) {
 		this.following = following;
+	}
+
+	public String getBio() {
+		return bio;
+	}
+
+	public void setBio(String bio) {
+		this.bio = bio;
 	}
 }
