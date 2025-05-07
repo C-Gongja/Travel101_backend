@@ -16,6 +16,7 @@ import com.sharavel.sharavel_be.auth.dto.AuthDto;
 import com.sharavel.sharavel_be.countries.dto.CountryDto;
 import com.sharavel.sharavel_be.countries.mapper.CountryMapper;
 import com.sharavel.sharavel_be.countries.repository.CountryRepository;
+import com.sharavel.sharavel_be.follow.repository.UserFollowRepository;
 import com.sharavel.sharavel_be.follow.service.UserFollowService;
 import com.sharavel.sharavel_be.security.CustomUserDetails;
 import com.sharavel.sharavel_be.security.util.JwtUtil;
@@ -23,6 +24,7 @@ import com.sharavel.sharavel_be.socialLink.dto.SocialLinkDto;
 import com.sharavel.sharavel_be.socialLink.service.SocialLinkService;
 import com.sharavel.sharavel_be.user.dto.UserPersonalInfoDto;
 import com.sharavel.sharavel_be.user.dto.UserProfileDto;
+import com.sharavel.sharavel_be.user.dto.UserSnippetDto;
 import com.sharavel.sharavel_be.user.entity.Users;
 import com.sharavel.sharavel_be.user.repository.UserRepository;
 import com.sharavel.sharavel_be.user.service.UserService;
@@ -35,6 +37,8 @@ public class UserServiceImpl implements UserService {
 	private UserRepository userRepository;
 	@Autowired
 	private CountryRepository countryRepository;
+	@Autowired
+	private UserFollowRepository userFollowRepository;
 	@Autowired
 	private UserFollowService userFollowService;
 	@Autowired
@@ -66,18 +70,32 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public UserProfileDto getProfile(String userUuid) {
-		Users user = userRepository.findByUuid(userUuid)
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication == null || !authentication.isAuthenticated()) {
+			throw new IllegalStateException("User is not authenticated");
+		}
+		// 인증된 유저 정보
+		String email = authentication.getName();
+		Users user = userRepository.findByEmail(email)
+				.orElseThrow(() -> new IllegalStateException("Verify User not found"));
+
+		Users targetUser = userRepository.findByUuid(userUuid)
 				.orElseThrow(() -> new RuntimeException("GetProfile User not found"));
 
 		Long followingCount = userFollowService.getFollowingCount(userUuid);
 		Long followersCount = userFollowService.getFollowersCount(userUuid);
 
-		List<CountryDto> countries = countryRepository.findDistinctCountriesByUser(user)
+		List<CountryDto> countries = countryRepository.findDistinctCountriesByUser(targetUser)
 				.stream()
 				.map(CountryMapper::toDto)
 				.toList();
 
-		return new UserProfileDto(user, countries, followingCount, followersCount);
+		boolean isFollowing = userFollowRepository.existsByFollowerIdAndFollowingId(user.getId(),
+				targetUser.getId());
+		UserSnippetDto userSnippet = new UserSnippetDto(targetUser.getUuid(), targetUser.getName(),
+				targetUser.getUsername(), isFollowing);
+
+		return new UserProfileDto(userSnippet, targetUser, countries, followingCount, followersCount);
 	}
 
 	@Override

@@ -9,9 +9,7 @@ import com.sharavel.sharavel_be.socialLink.mapper.SocialLinkMapper;
 import com.sharavel.sharavel_be.user.entity.Users;
 
 public class UserProfileDto {
-	private String uuid;
-	private String name;
-	private String username;
+	private UserSnippetDto userSnippet;
 	private List<SocialLinkDto> socialLinks;
 	private List<CountryDto> countries;
 	private Long followingCount;
@@ -20,44 +18,27 @@ public class UserProfileDto {
 	private Integer totalTravelDays;
 	private String bio;
 
-	public UserProfileDto(Users user, List<CountryDto> countries, Long followingCount, Long followersCount) {
-		this.uuid = user.getUuid();
-		this.name = user.getName();
-		this.username = user.getUsername();
+	public UserProfileDto(UserSnippetDto userSnippet, Users user, List<CountryDto> countries, Long followingCount,
+			Long followersCount) {
+		this.userSnippet = userSnippet;
 		this.socialLinks = user.getSocialLinks()
 				.stream()
 				.map(SocialLinkMapper::toDto)
 				.collect(Collectors.toList());
-		this.countries = countries;
-		this.followingCount = followingCount;
-		this.followersCount = followersCount;
 		this.totalTrips = user.getTotalTrips();
 		this.totalTravelDays = user.getTotalTripDays();
 		this.bio = user.getBio();
+		this.countries = countries;
+		this.followingCount = followingCount;
+		this.followersCount = followersCount;
 	}
 
-	public String getUuid() {
-		return uuid;
+	public UserSnippetDto getUserSnippet() {
+		return userSnippet;
 	}
 
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
+	public void setUserSnippet(UserSnippetDto userSnippet) {
+		this.userSnippet = userSnippet;
 	}
 
 	public List<SocialLinkDto> getSocialLinks() {
