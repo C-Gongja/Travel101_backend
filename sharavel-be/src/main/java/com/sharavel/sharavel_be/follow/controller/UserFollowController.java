@@ -1,5 +1,7 @@
 package com.sharavel.sharavel_be.follow.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sharavel.sharavel_be.follow.service.UserFollowService;
+import com.sharavel.sharavel_be.user.entity.Users;
 
 @RestController
 @RequestMapping("/api/users")
@@ -21,10 +24,10 @@ public class UserFollowController {
 
 	// 팔로우 유저 (팔로우를 추가하는 API)
 	@PostMapping("/follow")
-	public ResponseEntity<String> followUser(@RequestParam String followingId) {
+	public ResponseEntity<String> followUser(@RequestParam String targetId) {
 		try {
 			// 팔로우 로직 처리
-			userFollowService.followUser(followingId);
+			userFollowService.followUser(targetId);
 			return ResponseEntity.ok("Followed successfully");
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to follow user");
@@ -33,14 +36,28 @@ public class UserFollowController {
 
 	// 언팔로우 유저 (팔로우를 제거하는 API)
 	@DeleteMapping("/unfollow")
-	public ResponseEntity<String> unfollowUser(@RequestParam String unFollowId) {
+	public ResponseEntity<String> unfollowUser(@RequestParam String targetId) {
 		try {
 			// 언팔로우 로직 처리
-			userFollowService.unfollowUser(unFollowId);
+			userFollowService.unfollowUser(targetId);
 			return ResponseEntity.ok("Unfollowed successfully");
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to unfollow user");
 		}
+	}
+
+	// 특정 유저가 팔로우하는 유저들 조회 (예: followerId가 팔로우하는 유저들)
+	@GetMapping("/followings")
+	public ResponseEntity<List<Users>> getFollowing(@RequestParam String username) {
+		List<Users> followingUsers = userFollowService.getAllFollowing(username);
+		return ResponseEntity.ok(followingUsers);
+	}
+
+	// 특정 유저를 팔로우하는 유저들 조회 (예: followingId를 팔로우한 유저들)
+	@GetMapping("/followers")
+	public ResponseEntity<List<Users>> getFollowers(@RequestParam String username) {
+		List<Users> followers = userFollowService.getAllFollowers(username);
+		return ResponseEntity.ok(followers);
 	}
 
 	// // 특정 유저 팔로워 수 조회
@@ -55,21 +72,5 @@ public class UserFollowController {
 	// public ResponseEntity<Long> getFollowingCount(@PathVariable Long userId) {
 	// Long followingCount = userService.getFollowingCount(userId);
 	// return ResponseEntity.ok(followingCount);
-	// }
-
-	// // 특정 유저가 팔로우하는 유저들 조회 (예: followerId가 팔로우하는 유저들)
-	// @GetMapping("/{userId}/followings")
-	// public ResponseEntity<List<Users>> getFollowing(@RequestParam Long
-	// followerId) {
-	// List<Users> followingUsers = followerService.getFollowing(followerId);
-	// return ResponseEntity.ok(followingUsers);
-	// }
-
-	// // 특정 유저를 팔로우하는 유저들 조회 (예: followingId를 팔로우한 유저들)
-	// @GetMapping("/{userId}/followers")
-	// public ResponseEntity<List<Users>> getFollowers(@RequestParam Long
-	// followingId) {
-	// List<Users> followers = followerService.getFollowers(followingId);
-	// return ResponseEntity.ok(followers);
 	// }
 }

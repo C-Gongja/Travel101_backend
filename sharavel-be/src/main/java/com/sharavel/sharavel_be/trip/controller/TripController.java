@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sharavel.sharavel_be.trip.dto.TripDto;
@@ -77,7 +78,10 @@ public class TripController {
 
 	@DeleteMapping("/delete/{tripUid}")
 	public ResponseEntity<?> deleteTrip(@PathVariable String tripUid) {
-		tripService.deleteTrip(tripUid);
-		return ResponseEntity.ok("Successfully Deleted");
+		try {
+			return ResponseEntity.ok(tripService.deleteTrip(tripUid));
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to deleteTrip");
+		}
 	}
 }

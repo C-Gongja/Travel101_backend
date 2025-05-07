@@ -1,6 +1,7 @@
 package com.sharavel.sharavel_be.trip.dto;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import com.sharavel.sharavel_be.countries.dto.CountryDto;
@@ -9,8 +10,8 @@ public class TripListDto {
 	private String tripUid;
 	private String name;
 	private String username;
-	private Date startDate;
-	private Date endDate;
+	private LocalDate startDate;
+	private LocalDate endDate;
 	private List<CountryDto> countries;
 	private boolean isCompleted;
 	private Long scripted;
@@ -18,7 +19,7 @@ public class TripListDto {
 	public TripListDto() {
 	}
 
-	public TripListDto(String tripUid, String name, String username, Date startDate, Date endDate,
+	public TripListDto(String tripUid, String name, String username, LocalDate startDate, LocalDate endDate,
 			List<CountryDto> countries, boolean isCompleted, Long scripted) {
 		this.tripUid = tripUid;
 		this.username = username;
@@ -55,19 +56,19 @@ public class TripListDto {
 		this.username = username;
 	}
 
-	public Date getStartDate() {
+	public LocalDate getStartDate() {
 		return startDate;
 	}
 
-	public void setStartDate(Date startDate) {
+	public void setStartDate(LocalDate startDate) {
 		this.startDate = startDate;
 	}
 
-	public Date getEndDate() {
+	public LocalDate getEndDate() {
 		return endDate;
 	}
 
-	public void setEndDate(Date endDate) {
+	public void setEndDate(LocalDate endDate) {
 		this.endDate = endDate;
 	}
 

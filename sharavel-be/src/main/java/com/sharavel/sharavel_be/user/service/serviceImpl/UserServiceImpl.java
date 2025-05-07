@@ -70,7 +70,7 @@ public class UserServiceImpl implements UserService {
 				.orElseThrow(() -> new RuntimeException("GetProfile User not found"));
 
 		Long followingCount = userFollowService.getFollowingCount(userUuid);
-		Long followersCount = userFollowService.getFollowingCount(userUuid);
+		Long followersCount = userFollowService.getFollowersCount(userUuid);
 
 		List<CountryDto> countries = countryRepository.findDistinctCountriesByUser(user)
 				.stream()

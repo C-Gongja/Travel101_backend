@@ -14,7 +14,7 @@ public class UserProfileDto {
 	private String username;
 	private List<SocialLinkDto> socialLinks;
 	private List<CountryDto> countries;
-	private Long folloingCount;
+	private Long followingCount;
 	private Long followersCount;
 	private Integer totalTrips;
 	private Integer totalTravelDays;
@@ -29,7 +29,7 @@ public class UserProfileDto {
 				.map(SocialLinkMapper::toDto)
 				.collect(Collectors.toList());
 		this.countries = countries;
-		this.folloingCount = followingCount;
+		this.followingCount = followingCount;
 		this.followersCount = followersCount;
 		this.totalTrips = user.getTotalTrips();
 		this.totalTravelDays = user.getTotalTripDays();
@@ -76,12 +76,12 @@ public class UserProfileDto {
 		this.countries = countries;
 	}
 
-	public Long getFolloingCount() {
-		return folloingCount;
+	public Long getFollowingCount() {
+		return followingCount;
 	}
 
-	public void setFolloingCount(Long folloingCount) {
-		this.folloingCount = folloingCount;
+	public void setFollowingCount(Long folloingCount) {
+		this.followingCount = folloingCount;
 	}
 
 	public Long getFollowersCount() {

@@ -14,4 +14,8 @@ public interface UserFollowService {
 	public Long getFollowingCount(String userId);
 
 	public Long getFollowersCount(String userId);
+
+	public List<Users> getAllFollowing(String username);
+
+	public List<Users> getAllFollowers(String username);
 }

@@ -1,6 +1,7 @@
 package com.sharavel.sharavel_be.trip.entity;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -49,10 +50,10 @@ public class Trip {
 	private String name;
 
 	@Column(nullable = true)
-	private Date startDate;
+	private LocalDate startDate;
 
 	@Column(nullable = true)
-	private Date endDate;
+	private LocalDate endDate;
 
 	// planned, ongoing, completed
 	@Column(nullable = false)
@@ -120,19 +121,19 @@ public class Trip {
 		this.name = name;
 	}
 
-	public Date getStartDate() {
+	public LocalDate getStartDate() {
 		return startDate;
 	}
 
-	public void setStartDate(Date startDate) {
+	public void setStartDate(LocalDate startDate) {
 		this.startDate = startDate;
 	}
 
-	public Date getEndDate() {
+	public LocalDate getEndDate() {
 		return endDate;
 	}
 
-	public void setEndDate(Date endDate) {
+	public void setEndDate(LocalDate endDate) {
 		this.endDate = endDate;
 	}
 

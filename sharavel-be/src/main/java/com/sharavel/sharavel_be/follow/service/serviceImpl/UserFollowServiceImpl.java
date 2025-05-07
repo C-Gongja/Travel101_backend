@@ -39,9 +39,9 @@ public class UserFollowServiceImpl implements UserFollowService {
 	}
 
 	@Override
-	public ResponseEntity<?> followUser(String followingId) {
+	public ResponseEntity<?> followUser(String targetId) {
 		Users currentUser = getCurrentUser();
-		Users followedUser = userRepository.findByUuid(followingId)
+		Users followedUser = userRepository.findByUuid(targetId)
 				.orElseThrow(() -> new RuntimeException("User not found"));
 
 		if (currentUser.equals(followedUser)) {
@@ -65,9 +65,9 @@ public class UserFollowServiceImpl implements UserFollowService {
 
 	@Override
 	@Transactional
-	public ResponseEntity<?> unfollowUser(String unFollowId) {
+	public ResponseEntity<?> unfollowUser(String targetId) {
 		Users currentUser = getCurrentUser();
-		Users unfollowedUser = userRepository.findByUuid(unFollowId)
+		Users unfollowedUser = userRepository.findByUuid(targetId)
 				.orElseThrow(() -> new RuntimeException("User not found"));
 
 		if (currentUser.equals(unfollowedUser)) {
@@ -87,12 +87,24 @@ public class UserFollowServiceImpl implements UserFollowService {
 	@Override
 	public Long getFollowingCount(String userId) {
 		Users user = userRepository.findByUuid(userId).orElseThrow(() -> new RuntimeException("User not found"));
-		return userFollowRepository.countByFollowing_Id(user.getId());
+		return userFollowRepository.countByFollower(user);
 	}
 
 	@Override
 	public Long getFollowersCount(String userId) {
 		Users user = userRepository.findByUuid(userId).orElseThrow(() -> new RuntimeException("User not found"));
-		return userFollowRepository.countByFollower_Id(user.getId());
+		return userFollowRepository.countByFollowing(user);
+	}
+
+	@Override
+	public List<Users> getAllFollowing(String username) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'getAllFollowing'");
+	}
+
+	@Override
+	public List<Users> getAllFollowers(String username) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'getAllFollowers'");
 	}
 }

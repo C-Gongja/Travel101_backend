@@ -1,5 +1,7 @@
 package com.sharavel.sharavel_be.trip.service.serviceImpl;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -102,8 +104,12 @@ public class TripServiceImpl implements TripService {
 		trip.setTripUid(UUID.randomUUID().toString());
 		trip.setUid(user);
 		trip.setName(scriptedTrip.getName());
-		trip.setStartDate(scriptedTrip.getStartDate());
-		trip.setEndDate(scriptedTrip.getEndDate());
+
+		LocalDate today = LocalDate.now();
+		int scriptedTripDays = (int) ChronoUnit.DAYS.between(scriptedTrip.getStartDate(), scriptedTrip.getEndDate());
+		trip.setStartDate(today);
+		trip.setEndDate(today.plusDays(scriptedTripDays));
+
 		trip.setCompleted(false);
 		trip.setCountries(scriptedTrip.getCountries());
 		trip.setScripted(0L);
@@ -211,11 +217,28 @@ public class TripServiceImpl implements TripService {
 		trip.setTripUid(trip.getTripUid());
 		trip.setUid(user);
 		trip.setName(updatedTrip.getName());
+
+		// 기존 trip이 완료된 경우에만 totalTripDays와 totalTrips 감소
+		if (trip.isCompleted()) {
+			int currentTripDays = (int) ChronoUnit.DAYS.between(trip.getStartDate(), trip.getEndDate()) + 1;
+			user.setTotalTripDays(user.getTotalTripDays() - currentTripDays);
+			user.setTotalTrips(user.getTotalTrips() - 1);
+		}
+
+		LocalDate today = LocalDate.now();
+		if (updatedTrip.getEndDate() != null && updatedTrip.getEndDate().isBefore(today.plusDays(1))) {
+			int updatedTripDays = (int) ChronoUnit.DAYS.between(updatedTrip.getStartDate(), updatedTrip.getEndDate()) + 1;
+			user.setTotalTripDays(user.getTotalTripDays() + updatedTripDays);
+			user.setTotalTrips(user.getTotalTrips() + 1);
+			trip.setCompleted(true);
+		} else {
+			trip.setCompleted(false);
+		}
+
 		trip.setStartDate(updatedTrip.getStartDate());
 		trip.setEndDate(updatedTrip.getEndDate());
-		trip.setCompleted(updatedTrip.isCompleted());
 		trip.setCountries(countries);
-		trip.setScripted(updatedTrip.getScripted()); // Default value
+		trip.setScripted(0L);
 
 		Map<Integer, Days> existingDaysMap = trip.getDays().stream()
 				.collect(Collectors.toMap(Days::getNumber, day -> day));
@@ -254,7 +277,10 @@ public class TripServiceImpl implements TripService {
 		// trip.getDays().removeAll(existingDaysMap.values());
 		trip.getDays().clear();
 		trip.getDays().addAll(updatedDays);
-		// save
+
+		if (trip.isCompleted()) {
+			userRepository.save(user);
+		}
 		Trip savedTrip = tripRepository.save(trip);
 
 		return tripMapper.toDto(savedTrip);
@@ -268,9 +294,26 @@ public class TripServiceImpl implements TripService {
 
 	@Override
 	public ResponseEntity<?> deleteTrip(String tripUuid) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication == null || !authentication.isAuthenticated()) {
+			throw new IllegalStateException("User is not authenticated");
+		}
+
+		String email = authentication.getName();
+		Users user = userRepository.findByEmail(email)
+				.orElseThrow(() -> new IllegalStateException("putUpdatedTrip User not found"));
+
 		Trip trip = tripRepository.findByTripUid(tripUuid)
 				.orElseThrow(() -> new RuntimeException("deleteTrip Trip not found"));
+
+		int tripDays = (int) ChronoUnit.DAYS.between(trip.getStartDate(), trip.getEndDate()) + 1;
+		user.setTotalTripDays(user.getTotalTripDays() - tripDays);
+		user.setTotalTrips(user.getTotalTrips() - 1);
+
+		userRepository.save(user);
 		tripRepository.delete(trip);
-		throw new UnsupportedOperationException("Unimplemented method 'deleteTrip'");
+		return ResponseEntity.ok("Deleted Trip");
+		// throw new UnsupportedOperationException("Unimplemented method 'deleteTrip'");
 	}
+
 }
