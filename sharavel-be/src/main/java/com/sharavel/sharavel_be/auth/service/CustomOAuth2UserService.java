@@ -19,16 +19,20 @@ import com.sharavel.sharavel_be.user.entity.Roles;
 import com.sharavel.sharavel_be.user.entity.Users;
 import com.sharavel.sharavel_be.user.repository.RoleRepository;
 import com.sharavel.sharavel_be.user.repository.UserRepository;
+import com.sharavel.sharavel_be.user.service.UserService;
 import com.sharavel.sharavel_be.util.RoleConstants;
 
 @Service
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
 	private final UserRepository userRepository;
+	private final UserService userService;
 	private final RoleRepository roleRepository;
 
-	public CustomOAuth2UserService(UserRepository userRepository, RoleRepository roleRepository) {
+	public CustomOAuth2UserService(UserRepository userRepository, UserService userService,
+			RoleRepository roleRepository) {
 		this.userRepository = userRepository;
+		this.userService = userService;
 		this.roleRepository = roleRepository;
 	}
 
@@ -41,8 +45,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 		String name = oAuth2User.getAttribute("name");
 		String picture = oAuth2User.getAttribute("picture");
 		String providerId = oAuth2User.getAttribute("sub");
-
-		System.out.println("!!!" + oAuth2User);
+		String randomUsername = userService.generateRandomUsername(name);
 
 		// 저장 또는 업데이트
 		Users user = userRepository.findByEmail(email)
@@ -50,6 +53,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 					Users newUser = new Users();
 					newUser.setEmail(email);
 					newUser.setName(name);
+					newUser.setUsername(randomUsername);
 					newUser.setPicture(picture);
 					newUser.setProvider("google");
 					newUser.setProviderId(providerId);

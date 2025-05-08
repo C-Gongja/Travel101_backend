@@ -27,6 +27,7 @@ import com.sharavel.sharavel_be.security.jwt.JwtAuthFilter;
 import com.sharavel.sharavel_be.security.util.JwtUtil;
 import com.sharavel.sharavel_be.user.repository.RoleRepository;
 import com.sharavel.sharavel_be.user.repository.UserRepository;
+import com.sharavel.sharavel_be.user.service.UserService;
 
 @Configuration
 @EnableWebSecurity
@@ -36,16 +37,19 @@ public class SecurityConfig {
 	private final JwtAuthFilter jwtAuthFilter;
 	private final UserDetailsService userDetailsService;
 	private final UserRepository userRepository;
+	private final UserService userService;
 	private final RoleRepository roleRepository;
 	private final JwtUtil jwtUtil;
 
 	public SecurityConfig(JwtAuthEntryPoint jwtAuthEntryPoint, JwtAuthFilter jwtAuthFilter,
-			UserDetailsService userDetailsService, UserRepository userRepository, RoleRepository roleRepository,
+			UserDetailsService userDetailsService, UserRepository userRepository, UserService userService,
+			RoleRepository roleRepository,
 			JwtUtil jwtUtil) {
 		this.jwtAuthEntryPoint = jwtAuthEntryPoint;
 		this.jwtAuthFilter = jwtAuthFilter;
 		this.userDetailsService = userDetailsService;
 		this.userRepository = userRepository;
+		this.userService = userService;
 		this.roleRepository = roleRepository;
 		this.jwtUtil = jwtUtil;
 	}
@@ -94,7 +98,7 @@ public class SecurityConfig {
 
 	@Bean
 	public CustomOAuth2UserService customOAuth2UserService() {
-		return new CustomOAuth2UserService(userRepository, roleRepository);
+		return new CustomOAuth2UserService(userRepository, userService, roleRepository);
 	}
 
 	@Bean

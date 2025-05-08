@@ -2,6 +2,7 @@ package com.sharavel.sharavel_be.user.service.serviceImpl;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -107,12 +108,6 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public UserProfileDto updateUserProfile(String userUuid) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'updateUserProfile'");
-	}
-
-	@Override
 	public UserPersonalInfoDto updateUserPersonalInfo(String uuid, Map<String, Object> updates) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		if (authentication == null || !authentication.isAuthenticated()) {
@@ -123,41 +118,69 @@ public class UserServiceImpl implements UserService {
 		Users user = userRepository.findByEmail(email)
 				.orElseThrow(() -> new IllegalStateException("Create Trip User not found"));
 
-		if (updates.containsKey("name")) {
-			user.setName((String) updates.get("name"));
-		}
-		if (updates.containsKey("username")) {
-			user.setUsername((String) updates.get("username"));
-		}
-		if (updates.containsKey("email")) {
-			user.setEmail((String) updates.get("email"));
-		}
-		if (updates.containsKey("country")) {
-			user.setCountry((String) updates.get("country"));
-		}
-		if (updates.containsKey("socialLinks")) {
-			Object rawLinks = updates.get("socialLinks");
-
-			if (rawLinks instanceof List<?>) {
-				try {
-					List<SocialLinkDto> socialLinks = objectMapper.convertValue(
-							rawLinks,
-							new TypeReference<List<SocialLinkDto>>() {
-							});
-					socialLinksServicer.setSocialLinks(socialLinks);
-				} catch (IllegalArgumentException e) {
-					throw new RuntimeException("Failed to parse socialLinks", e);
+		updates.forEach((key, value) -> {
+			switch (key) {
+				case "name" -> user.setName((String) value);
+				case "username" -> {
+					String newUsername = (String) value;
+					if (checkUniqueUsername(newUsername)) {
+						user.setUsername(newUsername);
+					} else {
+						throw new IllegalArgumentException("'" + newUsername + "' already exists.");
+					}
 				}
-			} else {
-				throw new IllegalArgumentException("Expected socialLinks to be a list");
+				case "email" -> user.setEmail((String) value);
+				case "country" -> user.setCountry((String) value);
+				case "socialLinks" -> {
+					if (value instanceof List<?>) {
+						try {
+							List<SocialLinkDto> socialLinks = objectMapper.convertValue(
+									value,
+									new TypeReference<List<SocialLinkDto>>() {
+									});
+							socialLinksServicer.setSocialLinks(socialLinks);
+						} catch (IllegalArgumentException e) {
+							throw new RuntimeException("Failed to parse socialLinks", e);
+						}
+					} else {
+						throw new IllegalArgumentException("Expected socialLinks to be a list");
+					}
+				}
+				case "bio" -> user.setBio((String) value);
+				default -> {
+					throw new IllegalArgumentException("Unknown field: " + key);
+				}
 			}
-		}
-		if (updates.containsKey("bio")) {
-			user.setBio((String) updates.get("bio"));
-		}
+		});
 
 		userRepository.save(user);
 		UserPersonalInfoDto updatedUserInfo = new UserPersonalInfoDto(user);
 		return updatedUserInfo;
+	}
+
+	@Override
+	public UserProfileDto updateUserProfile(String userUuid) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'updateUserProfile'");
+	}
+
+	@Override
+	public String generateRandomUsername(String name) {
+		String chars = "0123456789";
+		StringBuilder sb = new StringBuilder(name);
+		Random random = new Random();
+		for (int i = 0; i < 6; i++) {
+			sb.append(chars.charAt(random.nextInt(chars.length())));
+		}
+		String username = sb.toString();
+		while (userRepository.existsByUsername(username)) {
+			username = generateRandomUsername(name);
+		}
+		return username;
+	}
+
+	@Override
+	public boolean checkUniqueUsername(String username) {
+		return !userRepository.existsByUsername(username);
 	}
 }

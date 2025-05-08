@@ -44,15 +44,24 @@ public class UserController {
 			UserPersonalInfoDto user = userService.getPersonalInfo(userUuid);
 			return ResponseEntity.ok(user);
 		} catch (Error e) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Can't get a user profile");
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Can't get a user profile Info");
 		}
 	}
 
 	@PatchMapping("/account/{userUuid}")
 	public ResponseEntity<?> updateUserPersonalInfo(@PathVariable String userUuid,
 			@RequestBody Map<String, Object> updates) {
-		UserPersonalInfoDto updatedUserInfoDto = userService.updateUserPersonalInfo(userUuid, updates);
-		return ResponseEntity.ok(updatedUserInfoDto);
+		try {
+			UserPersonalInfoDto updatedUserInfoDto = userService.updateUserPersonalInfo(userUuid, updates);
+			return ResponseEntity.ok(updatedUserInfoDto);
+		} catch (IllegalArgumentException e) {
+			System.out.println("!!!!!!!!!!!!!!!!error: " + e.getMessage());
+			return ResponseEntity
+					.status(HttpStatus.BAD_REQUEST)
+					.body(Map.of("error", e.getMessage()));
+		} catch (Error e) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Can't update user personal information");
+		}
 	}
 
 	@GetMapping("/admin/adminProfile")

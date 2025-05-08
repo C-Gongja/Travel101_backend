@@ -21,6 +21,7 @@ import com.sharavel.sharavel_be.user.entity.Roles;
 import com.sharavel.sharavel_be.user.entity.Users;
 import com.sharavel.sharavel_be.user.repository.RoleRepository;
 import com.sharavel.sharavel_be.user.repository.UserRepository;
+import com.sharavel.sharavel_be.user.service.UserService;
 import com.sharavel.sharavel_be.util.RoleConstants;
 
 import jakarta.servlet.http.Cookie;
@@ -32,6 +33,8 @@ public class AuthServiceImpl implements AuthService {
 	private JwtUtil jwtUtil;
 	@Autowired
 	private UserRepository userRepository;
+	@Autowired
+	private UserService userService;
 	@Autowired
 	private RoleRepository roleRepository;
 	@Autowired
@@ -48,6 +51,10 @@ public class AuthServiceImpl implements AuthService {
 
 		Users newUser = new Users();
 		newUser.setName(request.getName());
+
+		String randomUsername = userService.generateRandomUsername(request.getName());
+		newUser.setUsername(randomUsername);
+
 		newUser.setEmail(request.getEmail());
 		newUser.setPassword(passwordEncoder.encode(request.getPassword()));
 		newUser.setTotalTripDays(0);
