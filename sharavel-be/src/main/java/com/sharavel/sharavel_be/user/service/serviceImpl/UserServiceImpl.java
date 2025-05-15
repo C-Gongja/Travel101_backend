@@ -71,17 +71,19 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public UserProfileDto getProfile(String userUuid) {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		if (authentication == null || !authentication.isAuthenticated()) {
-			throw new IllegalStateException("User is not authenticated");
-		}
-		// 인증된 유저 정보
-		String email = authentication.getName();
-		Users user = userRepository.findByEmail(email)
-				.orElseThrow(() -> new IllegalStateException("Verify User not found"));
-
+		boolean isFollowing = false;
 		Users targetUser = userRepository.findByUuid(userUuid)
 				.orElseThrow(() -> new RuntimeException("GetProfile User not found"));
+
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication != null && authentication.isAuthenticated()
+				&& !"anonymousUser".equals(authentication.getName())) {
+			String email = authentication.getName();
+			Users currentUser = userRepository.findByEmail(email)
+					.orElse(null);
+
+			isFollowing = userFollowRepository.existsByFollowerIdAndFollowingId(currentUser.getId(), targetUser.getId());
+		}
 
 		Long followingCount = userFollowService.getFollowingCount(userUuid);
 		Long followersCount = userFollowService.getFollowersCount(userUuid);
@@ -91,8 +93,6 @@ public class UserServiceImpl implements UserService {
 				.map(CountryMapper::toDto)
 				.toList();
 
-		boolean isFollowing = userFollowRepository.existsByFollowerIdAndFollowingId(user.getId(),
-				targetUser.getId());
 		UserSnippetDto userSnippet = new UserSnippetDto(targetUser.getUuid(), targetUser.getName(),
 				targetUser.getUsername(), isFollowing);
 

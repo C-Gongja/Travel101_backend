@@ -141,10 +141,15 @@ public class TripServiceImpl implements TripService {
 
 	@Override
 	public TripResponse getTripByUuid(String tripUid) {
+		boolean isEditable = false;
+		boolean isFollowing = false;
+		Users currentUser = null;
+
 		Trip trip = tripRepository.findByTripUid(tripUid)
 				.orElseThrow(() -> new RuntimeException("getTripByUuid Trip not found"));
-		boolean isEditable = false;
-		Users currentUser = null;
+
+		Users tripOwner = userRepository.findByUuid(trip.getUid().getUuid())
+				.orElseThrow(() -> new IllegalStateException("getTripByUuid User not found"));
 
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		if (authentication != null && authentication.isAuthenticated()
@@ -152,15 +157,12 @@ public class TripServiceImpl implements TripService {
 			String email = authentication.getName();
 			currentUser = userRepository.findByEmail(email)
 					.orElse(null);
+
+			isFollowing = userFollowRepository.existsByFollowerIdAndFollowingId(currentUser.getId(), tripOwner.getId());
 		}
 		if (currentUser != null && trip.getUid().equals(currentUser)) {
 			isEditable = true;
 		}
-
-		Users tripOwner = userRepository.findByUuid(trip.getUid().getUuid())
-				.orElseThrow(() -> new IllegalStateException("getTripByUuid User not found"));
-
-		boolean isFollowing = userFollowRepository.existsByFollowerIdAndFollowingId(currentUser.getId(), tripOwner.getId());
 
 		UserSnippetDto userSnippet = new UserSnippetDto(tripOwner.getUuid(), tripOwner.getName(),
 				tripOwner.getUsername(), isFollowing);
