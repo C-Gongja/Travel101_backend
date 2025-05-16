@@ -3,6 +3,7 @@ package com.sharavel.sharavel_be.follow.service.serviceImpl;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,8 +13,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.sharavel.sharavel_be.follow.entity.UserFollow;
+import com.sharavel.sharavel_be.follow.mapper.UserFollowMapper;
 import com.sharavel.sharavel_be.follow.repository.UserFollowRepository;
 import com.sharavel.sharavel_be.follow.service.UserFollowService;
+import com.sharavel.sharavel_be.user.dto.UserSnippetDto;
 import com.sharavel.sharavel_be.user.entity.Users;
 import com.sharavel.sharavel_be.user.repository.UserRepository;
 
@@ -97,14 +100,57 @@ public class UserFollowServiceImpl implements UserFollowService {
 	}
 
 	@Override
-	public List<Users> getAllFollowing(String username) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'getAllFollowing'");
+	public List<UserSnippetDto> getAllFollowing(String uuid) {
+		Users targetUser = userRepository.findByUuid(uuid).orElseThrow(() -> new RuntimeException("User not found"));
+		Users currentUser = null;
+
+		// 현재 로그인한 사용자 찾기
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication != null && authentication.isAuthenticated()
+				&& !"anonymousUser".equals(authentication.getName())) {
+			String email = authentication.getName();
+			currentUser = userRepository.findByEmail(email).orElse(null);
+		}
+
+		if (currentUser != null) {
+			System.out.println("!!!!!!currentUser: " + currentUser.toString());
+		}
+
+		final Users finalCurrentUser = currentUser;
+		// targetUser의 following 가져오기
+		List<UserFollow> following = userFollowRepository.findByFollower(targetUser);
+
+		// 각각의 팔로워가 currentUser로부터 팔로우되고 있는지 확인
+		return following.stream()
+				.map(f -> UserFollowMapper.toFollowingDto(f, finalCurrentUser, userFollowRepository))
+				.collect(Collectors.toList());
 	}
 
 	@Override
-	public List<Users> getAllFollowers(String username) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'getAllFollowers'");
+	public List<UserSnippetDto> getAllFollowers(String uuid) {
+		Users targetUser = userRepository.findByUuid(uuid).orElseThrow(() -> new RuntimeException("User not found"));
+
+		// 현재 로그인한 사용자 찾기
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		Users currentUser = null;
+
+		if (authentication != null && authentication.isAuthenticated()
+				&& !"anonymousUser".equals(authentication.getName())) {
+			String email = authentication.getName();
+			currentUser = userRepository.findByEmail(email).orElse(null);
+		}
+
+		if (currentUser != null) {
+			System.out.println("!!!!!!currentUser: " + currentUser.toString());
+		}
+
+		final Users finalCurrentUser = currentUser;
+		// targetUser의 followers 가져오기
+		List<UserFollow> followers = userFollowRepository.findByFollowing(targetUser);
+
+		// 각각의 팔로워가 currentUser로부터 팔로우되고 있는지 확인
+		return followers.stream()
+				.map(f -> UserFollowMapper.toFollowerDto(f, finalCurrentUser, userFollowRepository))
+				.collect(Collectors.toList());
 	}
 }

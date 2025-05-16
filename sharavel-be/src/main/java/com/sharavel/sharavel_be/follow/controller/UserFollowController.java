@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sharavel.sharavel_be.follow.service.UserFollowService;
-import com.sharavel.sharavel_be.user.entity.Users;
+import com.sharavel.sharavel_be.user.dto.UserSnippetDto;
 
 @RestController
 @RequestMapping("/api/users")
@@ -47,16 +47,16 @@ public class UserFollowController {
 	}
 
 	// 특정 유저가 팔로우하는 유저들 조회 (예: followerId가 팔로우하는 유저들)
-	@GetMapping("/followings")
-	public ResponseEntity<List<Users>> getFollowing(@RequestParam String username) {
-		List<Users> followingUsers = userFollowService.getAllFollowing(username);
+	@GetMapping("/following")
+	public ResponseEntity<List<UserSnippetDto>> getFollowing(@RequestParam String uuid) {
+		List<UserSnippetDto> followingUsers = userFollowService.getAllFollowing(uuid);
 		return ResponseEntity.ok(followingUsers);
 	}
 
 	// 특정 유저를 팔로우하는 유저들 조회 (예: followingId를 팔로우한 유저들)
 	@GetMapping("/followers")
-	public ResponseEntity<List<Users>> getFollowers(@RequestParam String username) {
-		List<Users> followers = userFollowService.getAllFollowers(username);
+	public ResponseEntity<List<UserSnippetDto>> getFollowers(@RequestParam String uuid) {
+		List<UserSnippetDto> followers = userFollowService.getAllFollowers(uuid);
 		return ResponseEntity.ok(followers);
 	}
 

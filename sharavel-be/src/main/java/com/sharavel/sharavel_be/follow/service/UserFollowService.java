@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 
-import com.sharavel.sharavel_be.user.entity.Users;
+import com.sharavel.sharavel_be.user.dto.UserSnippetDto;
 
 public interface UserFollowService {
 	public ResponseEntity<?> followUser(String followingId);
@@ -15,7 +15,7 @@ public interface UserFollowService {
 
 	public Long getFollowersCount(String userId);
 
-	public List<Users> getAllFollowing(String username);
+	public List<UserSnippetDto> getAllFollowing(String uuid);
 
-	public List<Users> getAllFollowers(String username);
+	public List<UserSnippetDto> getAllFollowers(String uuid);
 }

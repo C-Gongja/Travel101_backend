@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sharavel.sharavel_be.user.dto.UserPersonalInfoDto;
+import com.sharavel.sharavel_be.user.dto.UserProfileDto;
 import com.sharavel.sharavel_be.user.service.UserService;
 
 @RestController
@@ -50,6 +51,16 @@ public class UserController {
 					.body(Map.of("error", e.getMessage()));
 		} catch (Error e) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Can't update user personal information");
+		}
+	}
+
+	@GetMapping("/profile/{userUuid}")
+	public ResponseEntity<?> userProfile(@PathVariable String userUuid) {
+		try {
+			UserProfileDto user = userService.getProfile(userUuid);
+			return ResponseEntity.ok(user);
+		} catch (Error e) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Can't get a user profile");
 		}
 	}
 
