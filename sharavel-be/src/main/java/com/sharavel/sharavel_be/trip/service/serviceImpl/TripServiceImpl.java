@@ -223,8 +223,16 @@ public class TripServiceImpl implements TripService {
 		// 기존 trip이 완료된 경우에만 totalTripDays와 totalTrips 감소
 		if (trip.isCompleted()) {
 			int currentTripDays = (int) ChronoUnit.DAYS.between(trip.getStartDate(), trip.getEndDate()) + 1;
-			user.setTotalTripDays(user.getTotalTripDays() - currentTripDays);
-			user.setTotalTrips(user.getTotalTrips() - 1);
+
+			if (user.getTotalTripDays() >= currentTripDays) {
+				user.setTotalTripDays(user.getTotalTripDays() - currentTripDays);
+			} else {
+				user.setTotalTripDays(0);
+			}
+
+			if (user.getTotalTrips() > 0) {
+				user.setTotalTrips(user.getTotalTrips() - 1);
+			}
 		}
 
 		LocalDate today = LocalDate.now();
@@ -264,7 +272,7 @@ public class TripServiceImpl implements TripService {
 				location.setLatitude(locDto.getLatitude());
 				location.setDescription(locDto.getDescription());
 				updatedLocations.add(location);
-				existingLocationsMap.remove(locDto.getNumber()); // 처리된 항목 제거
+				existingLocationsMap.remove(locDto.getNumber());
 			}
 
 			// 삭제된 Location 제거
@@ -272,7 +280,7 @@ public class TripServiceImpl implements TripService {
 			day.getLocations().clear();
 			day.getLocations().addAll(updatedLocations);
 			updatedDays.add(day);
-			existingDaysMap.remove(dayDto.getNumber()); // 처리된 항목 제거
+			existingDaysMap.remove(dayDto.getNumber());
 		}
 
 		// 삭제된 Day 제거
@@ -315,7 +323,5 @@ public class TripServiceImpl implements TripService {
 		userRepository.save(user);
 		tripRepository.delete(trip);
 		return ResponseEntity.ok("Deleted Trip");
-		// throw new UnsupportedOperationException("Unimplemented method 'deleteTrip'");
 	}
-
 }

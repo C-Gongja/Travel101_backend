@@ -11,7 +11,6 @@ public class UserFollowMapper {
 		Users followerUser = userFollow.getFollower();
 		boolean isFollowing = false;
 
-		System.out.println("!!!!!!currentUser" + currentUser);
 		if (currentUser != null) {
 			isFollowing = userFollowRepository.existsByFollowerIdAndFollowingId(currentUser.getId(), followerUser.getId());
 		}

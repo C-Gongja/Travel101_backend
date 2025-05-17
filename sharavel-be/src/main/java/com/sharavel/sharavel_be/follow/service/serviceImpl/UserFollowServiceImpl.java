@@ -1,11 +1,12 @@
 package com.sharavel.sharavel_be.follow.service.serviceImpl;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -100,57 +101,42 @@ public class UserFollowServiceImpl implements UserFollowService {
 	}
 
 	@Override
-	public List<UserSnippetDto> getAllFollowing(String uuid) {
+	public Page<UserSnippetDto> getInfFollowers(String uuid, int page, int limit) {
 		Users targetUser = userRepository.findByUuid(uuid).orElseThrow(() -> new RuntimeException("User not found"));
 		Users currentUser = null;
 
-		// 현재 로그인한 사용자 찾기
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		if (authentication != null && authentication.isAuthenticated()
 				&& !"anonymousUser".equals(authentication.getName())) {
 			String email = authentication.getName();
 			currentUser = userRepository.findByEmail(email).orElse(null);
 		}
-
-		if (currentUser != null) {
-			System.out.println("!!!!!!currentUser: " + currentUser.toString());
-		}
-
 		final Users finalCurrentUser = currentUser;
-		// targetUser의 following 가져오기
-		List<UserFollow> following = userFollowRepository.findByFollower(targetUser);
 
-		// 각각의 팔로워가 currentUser로부터 팔로우되고 있는지 확인
-		return following.stream()
-				.map(f -> UserFollowMapper.toFollowingDto(f, finalCurrentUser, userFollowRepository))
-				.collect(Collectors.toList());
+		Pageable pageable = PageRequest.of(page, limit);
+		// targetUser의 followers 가져오기
+		Page<UserFollow> followers = userFollowRepository.findByFollowingUuid(targetUser.getUuid(), pageable);
+
+		return followers.map(f -> UserFollowMapper.toFollowerDto(f, finalCurrentUser, userFollowRepository));
 	}
 
 	@Override
-	public List<UserSnippetDto> getAllFollowers(String uuid) {
+	public Page<UserSnippetDto> getInfFollowing(String uuid, int page, int limit) {
 		Users targetUser = userRepository.findByUuid(uuid).orElseThrow(() -> new RuntimeException("User not found"));
-
-		// 현재 로그인한 사용자 찾기
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		Users currentUser = null;
 
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		if (authentication != null && authentication.isAuthenticated()
 				&& !"anonymousUser".equals(authentication.getName())) {
 			String email = authentication.getName();
 			currentUser = userRepository.findByEmail(email).orElse(null);
 		}
-
-		if (currentUser != null) {
-			System.out.println("!!!!!!currentUser: " + currentUser.toString());
-		}
-
 		final Users finalCurrentUser = currentUser;
-		// targetUser의 followers 가져오기
-		List<UserFollow> followers = userFollowRepository.findByFollowing(targetUser);
 
-		// 각각의 팔로워가 currentUser로부터 팔로우되고 있는지 확인
-		return followers.stream()
-				.map(f -> UserFollowMapper.toFollowerDto(f, finalCurrentUser, userFollowRepository))
-				.collect(Collectors.toList());
+		Pageable pageable = PageRequest.of(page, limit);
+		// targetUser의 following 가져오기
+		Page<UserFollow> following = userFollowRepository.findByFollowerUuid(targetUser.getUuid(), pageable);
+
+		return following.map(f -> UserFollowMapper.toFollowingDto(f, finalCurrentUser, userFollowRepository));
 	}
 }

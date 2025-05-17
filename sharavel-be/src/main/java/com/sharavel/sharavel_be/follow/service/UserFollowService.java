@@ -1,7 +1,6 @@
 package com.sharavel.sharavel_be.follow.service;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 
 import com.sharavel.sharavel_be.user.dto.UserSnippetDto;
@@ -15,7 +14,7 @@ public interface UserFollowService {
 
 	public Long getFollowersCount(String userId);
 
-	public List<UserSnippetDto> getAllFollowing(String uuid);
+	public Page<UserSnippetDto> getInfFollowers(String uuid, int page, int limit);
 
-	public List<UserSnippetDto> getAllFollowers(String uuid);
+	public Page<UserSnippetDto> getInfFollowing(String uuid, int page, int limit);
 }

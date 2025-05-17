@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sharavel.sharavel_be.trip.dto.TripDto;
@@ -30,7 +29,6 @@ public class TripController {
 
 	@PostMapping("/post")
 	public ResponseEntity<Map<String, Object>> createTrip(@RequestBody TripRequest trip) {
-		System.out.println("!!!!!!!!!!trip: " + trip);
 		TripDto savedTrip = tripService.createTrip(trip);
 		String redirectUrl = "/trip/" + savedTrip.getTripUid();
 
