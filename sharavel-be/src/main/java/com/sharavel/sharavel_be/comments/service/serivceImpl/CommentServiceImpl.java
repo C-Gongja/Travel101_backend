@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import com.sharavel.sharavel_be.comments.dto.CommentEditRequestDto;
 import com.sharavel.sharavel_be.comments.dto.CommentRequestDto;
-import com.sharavel.sharavel_be.comments.dto.CommentsResponseDto;
 import com.sharavel.sharavel_be.comments.dto.SingleCommentDto;
 import com.sharavel.sharavel_be.comments.entity.Comment;
 import com.sharavel.sharavel_be.comments.mapper.CommentMapper;
