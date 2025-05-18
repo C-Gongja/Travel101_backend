@@ -24,12 +24,8 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-
 	@Autowired
 	AuthService authService;
-
-	@Autowired
-	AuthenticationManager authenticationManager;
 
 	@PostMapping("/signup")
 	public ResponseEntity<?> signup(@RequestBody @Valid SignupRequest request, HttpServletResponse response) {
@@ -39,8 +35,7 @@ public class AuthController {
 	@PostMapping("/signin")
 	public ResponseEntity<?> login(@RequestBody @Valid SigninRequest request, HttpServletResponse response) {
 		try {
-			Authentication authentication = authenticationManager.authenticate(
-					new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+			Authentication authentication = authService.authenticate(request);
 
 			return authService.login(authentication, response);
 

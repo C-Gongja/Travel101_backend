@@ -1,6 +1,8 @@
 package com.sharavel.sharavel_be.auth.helper;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -32,13 +34,14 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
 			Authentication authentication) throws IOException, ServletException {
-		System.out.println("!!!! OAUTH Success");
+
 		OAuth2User user = (OAuth2User) authentication.getPrincipal();
 		String email = user.getAttribute("email");
 
 		Users authUser = userRepository.findByEmail(email).orElse(null);
 		CustomUserDetails userDetails = new CustomUserDetails(authUser);
 
+		String accessToken = jwtUtil.generateAccessToken(userDetails);
 		String refreshToken = jwtUtil.generateRefreshToken(userDetails);
 
 		// RefreshToken을 HttpOnly 쿠키로 설정
@@ -49,6 +52,25 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 		refreshCookie.setMaxAge(86400000); // 7일
 		response.addCookie(refreshCookie);
 
-		response.sendRedirect("http://localhost:3000/oauth2/redirect");
+		String state = request.getParameter("state");
+		String redirectUrl = "/";
+
+		if (state != null && !state.isEmpty()) {
+			try {
+				byte[] decodedBytes = Base64.getUrlDecoder().decode(state);
+				redirectUrl = new String(decodedBytes, StandardCharsets.UTF_8);
+
+				// redirectUrl에 토큰 추가 (프론트엔드에서 사용할 수 있도록)
+				if (redirectUrl.contains("?")) {
+					redirectUrl += "&token=" + accessToken;
+				} else {
+					redirectUrl += "?token=" + accessToken;
+				}
+			} catch (IllegalArgumentException e) {
+				// 디코딩 실패 시 기본값 유지
+			}
+		}
+
+		response.sendRedirect(redirectUrl);
 	}
 }

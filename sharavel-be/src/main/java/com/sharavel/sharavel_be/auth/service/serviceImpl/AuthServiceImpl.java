@@ -8,6 +8,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Service;
 import com.sharavel.sharavel_be.auth.dto.AuthDto;
 import com.sharavel.sharavel_be.auth.service.AuthService;
 import com.sharavel.sharavel_be.security.CustomUserDetails;
+import com.sharavel.sharavel_be.security.SigninRequest;
 import com.sharavel.sharavel_be.security.SignupRequest;
 import com.sharavel.sharavel_be.security.util.JwtUtil;
 import com.sharavel.sharavel_be.user.entity.Roles;
@@ -40,7 +44,13 @@ public class AuthServiceImpl implements AuthService {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
+	private final AuthenticationConfiguration authenticationConfiguration;
+
 	private static final Logger logger = LoggerFactory.getLogger(AuthServiceImpl.class);
+
+	public AuthServiceImpl(AuthenticationConfiguration authenticationConfiguration) {
+		this.authenticationConfiguration = authenticationConfiguration;
+	}
 
 	@Override
 	public ResponseEntity<?> signup(SignupRequest request, HttpServletResponse response) {
@@ -163,6 +173,17 @@ public class AuthServiceImpl implements AuthService {
 		} catch (Exception ex) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 					.body("Error: " + ex.getMessage());
+		}
+	}
+
+	@Override
+	public Authentication authenticate(SigninRequest request) {
+		try {
+			AuthenticationManager authenticationManager = authenticationConfiguration.getAuthenticationManager();
+			return authenticationManager.authenticate(
+					new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+		} catch (Exception e) {
+			throw new RuntimeException("Authentication failed", e);
 		}
 	}
 }

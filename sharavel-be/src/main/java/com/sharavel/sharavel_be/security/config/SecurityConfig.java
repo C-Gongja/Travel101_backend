@@ -4,30 +4,26 @@ import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.sharavel.sharavel_be.auth.helper.CustomAuthorizationRequestResolver;
 import com.sharavel.sharavel_be.auth.helper.OAuth2SuccessHandler;
 import com.sharavel.sharavel_be.auth.service.CustomOAuth2UserService;
 import com.sharavel.sharavel_be.security.jwt.JwtAuthEntryPoint;
 import com.sharavel.sharavel_be.security.jwt.JwtAuthFilter;
-import com.sharavel.sharavel_be.security.util.JwtUtil;
-import com.sharavel.sharavel_be.user.repository.RoleRepository;
-import com.sharavel.sharavel_be.user.repository.UserRepository;
-import com.sharavel.sharavel_be.user.service.UserService;
 
 @Configuration
 @EnableWebSecurity
@@ -36,22 +32,22 @@ public class SecurityConfig {
 	private final JwtAuthEntryPoint jwtAuthEntryPoint;
 	private final JwtAuthFilter jwtAuthFilter;
 	private final UserDetailsService userDetailsService;
-	private final UserRepository userRepository;
-	private final UserService userService;
-	private final RoleRepository roleRepository;
-	private final JwtUtil jwtUtil;
+	private final PasswordEncoder passwordEncoder;
+	private final OAuth2SuccessHandler oAuth2SuccessHandler;
+	private final CustomOAuth2UserService customOAuth2UserService;
+	private final ClientRegistrationRepository clientRegistrationRepository;
 
 	public SecurityConfig(JwtAuthEntryPoint jwtAuthEntryPoint, JwtAuthFilter jwtAuthFilter,
-			UserDetailsService userDetailsService, UserRepository userRepository, UserService userService,
-			RoleRepository roleRepository,
-			JwtUtil jwtUtil) {
+			UserDetailsService userDetailsService, PasswordEncoder passwordEncoder,
+			OAuth2SuccessHandler oAuth2SuccessHandler, CustomOAuth2UserService customOAuth2UserService,
+			ClientRegistrationRepository clientRegistrationRepository) {
 		this.jwtAuthEntryPoint = jwtAuthEntryPoint;
 		this.jwtAuthFilter = jwtAuthFilter;
 		this.userDetailsService = userDetailsService;
-		this.userRepository = userRepository;
-		this.userService = userService;
-		this.roleRepository = roleRepository;
-		this.jwtUtil = jwtUtil;
+		this.passwordEncoder = passwordEncoder;
+		this.oAuth2SuccessHandler = oAuth2SuccessHandler;
+		this.customOAuth2UserService = customOAuth2UserService;
+		this.clientRegistrationRepository = clientRegistrationRepository;
 	}
 
 	@Bean
@@ -62,15 +58,18 @@ public class SecurityConfig {
 				// Set session management to stateless why? this is jwt
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authorizeHttpRequests(authz -> authz
-						.requestMatchers("/test/**").permitAll()
 						.requestMatchers("/oauth2/**").permitAll()
 						.requestMatchers("/public/**").permitAll()
 						.requestMatchers("/auth/**").permitAll()
 						.requestMatchers("/api/**").authenticated()
 						.anyRequest().authenticated())
 				.oauth2Login(oauth2 -> oauth2
-						.userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService()))
-						.successHandler(oAuth2SuccessHandler()));
+						.authorizationEndpoint(authz -> authz
+								.authorizationRequestResolver(
+										new CustomAuthorizationRequestResolver(clientRegistrationRepository, "/oauth2/authorization")))
+						.userInfoEndpoint(userInfo -> userInfo
+								.userService(customOAuth2UserService))
+						.successHandler(oAuth2SuccessHandler));
 		http.authenticationProvider(authenticationProvider()); // Custom authentication provider
 		http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 		http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
@@ -79,31 +78,16 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
-
-	@Bean
 	public AuthenticationProvider authenticationProvider() {
 		DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
 		authenticationProvider.setUserDetailsService(userDetailsService);
-		authenticationProvider.setPasswordEncoder(passwordEncoder());
+		authenticationProvider.setPasswordEncoder(passwordEncoder);
 		return authenticationProvider;
 	}
 
 	@Bean
-	public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-		return config.getAuthenticationManager();
-	}
-
-	@Bean
-	public CustomOAuth2UserService customOAuth2UserService() {
-		return new CustomOAuth2UserService(userRepository, userService, roleRepository);
-	}
-
-	@Bean
-	public OAuth2SuccessHandler oAuth2SuccessHandler() {
-		return new OAuth2SuccessHandler(jwtUtil, userRepository);
+	public OAuth2AuthorizationRequestResolver customAuthorizationRequestResolver(ClientRegistrationRepository repo) {
+		return new CustomAuthorizationRequestResolver(repo, "/oauth2/authorization");
 	}
 
 	@Bean
