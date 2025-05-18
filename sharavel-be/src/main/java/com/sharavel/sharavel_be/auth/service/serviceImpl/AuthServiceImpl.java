@@ -64,7 +64,6 @@ public class AuthServiceImpl implements AuthService {
 
 		String randomUsername = userService.generateRandomUsername(request.getName());
 		newUser.setUsername(randomUsername);
-
 		newUser.setEmail(request.getEmail());
 		newUser.setPassword(passwordEncoder.encode(request.getPassword()));
 		newUser.setTotalTripDays(0);
