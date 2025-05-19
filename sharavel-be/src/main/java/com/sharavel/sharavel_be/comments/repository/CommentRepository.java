@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 import com.sharavel.sharavel_be.comments.entity.Comment;
 
 @Repository
-public interface CommentRepository extends JpaRepository<Comment, String> {
+public interface CommentRepository extends JpaRepository<Comment, Long> {
 	Optional<Comment> findByUid(String uid);
 }

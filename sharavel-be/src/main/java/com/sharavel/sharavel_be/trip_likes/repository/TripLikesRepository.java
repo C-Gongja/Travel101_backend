@@ -10,7 +10,7 @@ import com.sharavel.sharavel_be.user.entity.Users;
 import com.sharavel.sharavel_be.trip.entity.Trip;
 
 @Repository
-public interface TripLikesRepository extends JpaRepository<TripLikes, String> {
+public interface TripLikesRepository extends JpaRepository<TripLikes, Long> {
 	boolean existsByUserAndTrip(Users user, Trip trip);
 
 	Optional<TripLikes> findByUserAndTrip(Users user, Trip trip);
