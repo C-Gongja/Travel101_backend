@@ -14,6 +14,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 @Entity
@@ -21,11 +22,18 @@ import jakarta.persistence.Table;
 public class CommentLikes {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(nullable = false)
 	private Long id;
 
-	@Id
 	@Column(nullable = false, unique = true, updatable = false)
-	private String uid = UUID.randomUUID().toString();
+	private String uid;
+
+	@PrePersist
+	public void generateUUID() {
+		if (this.uid == null) {
+			this.uid = UUID.randomUUID().toString(); // UUID 자동 생성
+		}
+	}
 
 	// 좋아요 누른 유저
 	@ManyToOne(fetch = FetchType.LAZY)

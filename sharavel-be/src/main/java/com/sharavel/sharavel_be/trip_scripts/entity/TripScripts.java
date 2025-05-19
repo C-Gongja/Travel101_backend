@@ -14,16 +14,24 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 
 @Entity
 public class TripScripts {
+	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(nullable = false)
 	private Long id;
 
-	@Id
 	@Column(nullable = false, unique = true, updatable = false)
-	private String uid = UUID.randomUUID().toString();
+	private String uid;
+
+	@PrePersist
+	public void generateUUID() {
+		if (this.uid == null) {
+			this.uid = UUID.randomUUID().toString(); // UUID 자동 생성
+		}
+	}
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "trip_id")
@@ -34,4 +42,45 @@ public class TripScripts {
 	private Users scriptUser;
 
 	private LocalDateTime scriptedAt;
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getUid() {
+		return uid;
+	}
+
+	public void setUid(String uid) {
+		this.uid = uid;
+	}
+
+	public Trip getTrip() {
+		return trip;
+	}
+
+	public void setTrip(Trip trip) {
+		this.trip = trip;
+	}
+
+	public Users getScriptUser() {
+		return scriptUser;
+	}
+
+	public void setScriptUser(Users scriptUser) {
+		this.scriptUser = scriptUser;
+	}
+
+	public LocalDateTime getScriptedAt() {
+		return scriptedAt;
+	}
+
+	public void setScriptedAt(LocalDateTime scriptedAt) {
+		this.scriptedAt = scriptedAt;
+	}
+
 }
