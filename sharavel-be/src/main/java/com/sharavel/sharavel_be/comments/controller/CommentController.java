@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +22,7 @@ public class CommentController {
 	@Autowired
 	private CommentService commentService;
 
-	@PostMapping("/addcomment")
+	@PostMapping("/addComment")
 	public ResponseEntity<?> addComment(@RequestBody CommentRequestDto newComment) {
 		try {
 			return commentService.addComment(newComment);
@@ -30,7 +31,7 @@ public class CommentController {
 		}
 	}
 
-	@PostMapping("/editcomment")
+	@PostMapping("/editComment")
 	public ResponseEntity<?> editComment(@RequestBody CommentEditRequestDto editComment) {
 		try {
 			return commentService.editComment(editComment);
@@ -39,17 +40,12 @@ public class CommentController {
 		}
 	}
 
-	@DeleteMapping("/deletecomment")
+	@DeleteMapping("/deleteComment")
 	public ResponseEntity<?> deleteComment(@RequestParam CommentEditRequestDto deleteComment) {
 		try {
 			return commentService.deleteComment(deleteComment);
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 		}
-	}
-
-	@PostMapping("/gettripcomments")
-	public ResponseEntity<String> getTripComments(@RequestParam String tripUid) {
-		return null;
 	}
 }

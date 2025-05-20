@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
 
 import com.sharavel.sharavel_be.comment_likes.entity.CommentLikes;
 import com.sharavel.sharavel_be.comment_likes.repository.CommentLikesRepository;
@@ -14,6 +15,7 @@ import com.sharavel.sharavel_be.comments.repository.CommentRepository;
 import com.sharavel.sharavel_be.user.entity.Users;
 import com.sharavel.sharavel_be.user.repository.UserRepository;
 
+@Service
 public class CommentLikesServiceImpl implements CommentLikesService {
 	@Autowired
 	private UserRepository userRepository;

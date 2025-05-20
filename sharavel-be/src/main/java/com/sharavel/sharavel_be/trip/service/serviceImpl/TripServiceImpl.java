@@ -105,13 +105,18 @@ public class TripServiceImpl implements TripService {
 		trip.setUid(user);
 		trip.setName(scriptedTrip.getName());
 
+		Set<Country> countries = scriptedTrip.getCountries().stream()
+				.map(codeDto -> countryRepository.findByIso2(codeDto.getIso2())
+						.orElseThrow(() -> new RuntimeException("Country not found: " + codeDto.getIso2())))
+				.collect(Collectors.toSet());
+
 		LocalDate today = LocalDate.now();
 		int scriptedTripDays = (int) ChronoUnit.DAYS.between(scriptedTrip.getStartDate(), scriptedTrip.getEndDate());
 		trip.setStartDate(today);
 		trip.setEndDate(today.plusDays(scriptedTripDays));
 
 		trip.setCompleted(false);
-		trip.setCountries(scriptedTrip.getCountries());
+		trip.setCountries(countries);
 		trip.setScripted(0L);
 
 		List<Days> days = scriptedTrip.getDays().stream().map(originalDay -> {

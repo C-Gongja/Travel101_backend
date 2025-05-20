@@ -51,11 +51,11 @@ public class TripController {
 		return ResponseEntity.ok(tripResponse);
 	}
 
-	@PostMapping("/scriptTrip/{tripUid}")
-	public ResponseEntity<?> scriptTrip(@PathVariable String tripUid) {
-		tripService.scriptTrip(tripUid);
-		return ResponseEntity.ok("Successfully scripted!");
-	}
+	// @PostMapping("/scriptTrip/{tripUid}")
+	// public ResponseEntity<?> scriptTrip(@PathVariable String tripUid) {
+	// tripService.scriptTrip(tripUid);
+	// return ResponseEntity.ok("Successfully scripted!");
+	// }
 
 	@PutMapping("/{tripUid}")
 	public ResponseEntity<TripDto> putTripField(

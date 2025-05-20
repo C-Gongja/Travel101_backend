@@ -32,5 +32,4 @@ public class CommentLikesController {
 	public ResponseEntity<?> getTripLikes(@RequestBody String tripUid) {
 		return ResponseEntity.status(HttpStatus.OK).body(commentLikesService.getCommentLikes(tripUid));
 	}
-
 }

@@ -1,4 +1,4 @@
-package com.sharavel.sharavel_be.trip_scripts.entity;
+package com.sharavel.sharavel_be.trip_script.entity;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -17,7 +17,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 
 @Entity
-public class TripScripts {
+public class TripScript {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(nullable = false)
@@ -40,6 +40,10 @@ public class TripScripts {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id")
 	private Users scriptUser;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "copied_trip_id")
+	private Trip copiedTrip;
 
 	private LocalDateTime scriptedAt;
 
@@ -81,6 +85,14 @@ public class TripScripts {
 
 	public void setScriptedAt(LocalDateTime scriptedAt) {
 		this.scriptedAt = scriptedAt;
+	}
+
+	public Trip getCopiedTrip() {
+		return copiedTrip;
+	}
+
+	public void setCopiedTrip(Trip copiedTrip) {
+		this.copiedTrip = copiedTrip;
 	}
 
 }
