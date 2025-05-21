@@ -10,7 +10,7 @@ public interface CommentService {
 
 	public ResponseEntity<?> editComment(CommentEditRequestDto editComment);
 
-	public ResponseEntity<?> softDeleteComment(CommentEditRequestDto deleteComment);
+	public ResponseEntity<?> softDeleteComment(String targetUid);
 
 	public ResponseEntity<?> getRootComments(String targetType, String targetUid);
 

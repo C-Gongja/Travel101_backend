@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -30,7 +31,7 @@ public class CommentController {
 		}
 	}
 
-	@PostMapping("/editComment")
+	@PutMapping("/editComment")
 	public ResponseEntity<?> editComment(@RequestBody CommentEditRequestDto editComment) {
 		try {
 			return commentService.editComment(editComment);
@@ -40,9 +41,9 @@ public class CommentController {
 	}
 
 	@DeleteMapping("/deleteComment")
-	public ResponseEntity<?> deleteComment(@RequestParam CommentEditRequestDto deleteComment) {
+	public ResponseEntity<?> deleteComment(@RequestParam String targetUid) {
 		try {
-			return commentService.softDeleteComment(deleteComment);
+			return commentService.softDeleteComment(targetUid);
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 		}

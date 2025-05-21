@@ -63,6 +63,7 @@ public class CommentServiceImpl implements CommentService {
 
 	@Override
 	public ResponseEntity<?> editComment(CommentEditRequestDto editComment) {
+		System.out.println("!!!!!!!!!!!!!!editComment: " + editComment.toString());
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		if (authentication == null || !authentication.isAuthenticated()) {
 			throw new IllegalStateException("User not authenticated");
@@ -79,12 +80,12 @@ public class CommentServiceImpl implements CommentService {
 	}
 
 	@Override
-	public ResponseEntity<?> softDeleteComment(CommentEditRequestDto deleteComment) {
+	public ResponseEntity<?> softDeleteComment(String targetUid) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		if (authentication == null || !authentication.isAuthenticated()) {
 			throw new IllegalStateException("User not authenticated");
 		}
-		Comment comment = CommentRepository.findByUid(deleteComment.getCommentUid())
+		Comment comment = CommentRepository.findByUid(targetUid)
 				.orElseThrow(() -> new IllegalStateException("Current comment not found"));
 
 		comment.setDeleted(true);

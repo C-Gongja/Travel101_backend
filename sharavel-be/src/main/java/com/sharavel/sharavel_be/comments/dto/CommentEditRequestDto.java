@@ -2,7 +2,6 @@ package com.sharavel.sharavel_be.comments.dto;
 
 public class CommentEditRequestDto {
 	private String commentUid;
-	private String targetType;
 	private String content;
 
 	public String getCommentUid() {
@@ -21,12 +20,10 @@ public class CommentEditRequestDto {
 		this.content = content;
 	}
 
-	public String getTargetType() {
-		return targetType;
+	@Override
+	public String toString() {
+		return "CommentEditRequestDto [commentUid=" + commentUid + ", content=" + content + "]";
 	}
 
-	public void setTargetType(String targetType) {
-		this.targetType = targetType;
-	}
-
+	
 }
