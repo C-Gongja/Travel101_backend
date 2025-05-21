@@ -1,24 +1,23 @@
-package com.sharavel.sharavel_be.comments.dto;
+package com.sharavel.sharavel_be.tripComments.dto;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
-public class CommentsResponseDto {
+public class SingleTripCommentDto {
 	private String uid;
 	private String content;
-	private String userName; // or userId, or both
+	private String userName;
 	private String userUid;
 	private LocalDateTime createdAt;
-	private List<CommentsResponseDto> replies; // 재귀적 구조
+	private String parentUid;
 
-	public CommentsResponseDto(String uid, String content, String userName, String userUid, LocalDateTime createdAt,
-			List<CommentsResponseDto> replies) {
+	public SingleTripCommentDto(String uid, String content, String userName, String userUid, LocalDateTime createdAt,
+			String parentUid) {
 		this.uid = uid;
 		this.content = content;
 		this.userName = userName;
 		this.userUid = userUid;
 		this.createdAt = createdAt;
-		this.replies = replies;
+		this.parentUid = parentUid;
 	}
 
 	public String getUid() {
@@ -61,12 +60,12 @@ public class CommentsResponseDto {
 		this.createdAt = createdAt;
 	}
 
-	public List<CommentsResponseDto> getReplies() {
-		return replies;
+	public String getParentUid() {
+		return parentUid;
 	}
 
-	public void setReplies(List<CommentsResponseDto> replies) {
-		this.replies = replies;
+	public void setParentUid(String parentUid) {
+		this.parentUid = parentUid;
 	}
 
 }

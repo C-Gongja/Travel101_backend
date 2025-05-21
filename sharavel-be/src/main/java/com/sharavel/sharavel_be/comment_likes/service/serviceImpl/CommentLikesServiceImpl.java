@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 import com.sharavel.sharavel_be.comment_likes.entity.CommentLikes;
 import com.sharavel.sharavel_be.comment_likes.repository.CommentLikesRepository;
 import com.sharavel.sharavel_be.comment_likes.service.CommentLikesService;
-import com.sharavel.sharavel_be.comments.entity.Comment;
-import com.sharavel.sharavel_be.comments.repository.CommentRepository;
+import com.sharavel.sharavel_be.tripComments.entity.TripComment;
+import com.sharavel.sharavel_be.tripComments.repository.TripCommentRepository;
 import com.sharavel.sharavel_be.user.entity.Users;
 import com.sharavel.sharavel_be.user.repository.UserRepository;
 
@@ -20,7 +20,7 @@ public class CommentLikesServiceImpl implements CommentLikesService {
 	@Autowired
 	private UserRepository userRepository;
 	@Autowired
-	private CommentRepository commentRepository;
+	private TripCommentRepository commentRepository;
 	@Autowired
 	private CommentLikesRepository commentLikesRepository;
 
@@ -37,7 +37,7 @@ public class CommentLikesServiceImpl implements CommentLikesService {
 	@Override
 	public String addLike(String commentUid) {
 		Users user = getCurrentUser();
-		Comment comment = commentRepository.findByUid(commentUid)
+		TripComment comment = commentRepository.findByUid(commentUid)
 				.orElseThrow(() -> new IllegalStateException("Current trip not found"));
 		CommentLikes commentLike = new CommentLikes();
 		commentLike.setUser(user);
@@ -51,7 +51,7 @@ public class CommentLikesServiceImpl implements CommentLikesService {
 	@Override
 	public String removeLike(String commentUid) {
 		Users user = getCurrentUser();
-		Comment comment = commentRepository.findByUid(commentUid)
+		TripComment comment = commentRepository.findByUid(commentUid)
 				.orElseThrow(() -> new IllegalArgumentException("Comment not found"));
 
 		CommentLikes like = commentLikesRepository.findByUserAndComment(user, comment)
@@ -63,7 +63,7 @@ public class CommentLikesServiceImpl implements CommentLikesService {
 
 	@Override
 	public int getCommentLikes(String commentUid) {
-		Comment comment = commentRepository.findByUid(commentUid)
+		TripComment comment = commentRepository.findByUid(commentUid)
 				.orElseThrow(() -> new IllegalArgumentException("Comment not found"));
 		return commentLikesRepository.countByComment(comment);
 	}

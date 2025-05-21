@@ -1,4 +1,4 @@
-package com.sharavel.sharavel_be.comments.entity;
+package com.sharavel.sharavel_be.tripComments.entity;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 
 @Entity
-public class Comment {
+public class TripComment {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(nullable = false)
@@ -47,7 +47,7 @@ public class Comment {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "parent_id")
-	private Comment parent;
+	private TripComment parent;
 
 	@Column(nullable = false)
 	private String content;
@@ -58,9 +58,12 @@ public class Comment {
 	@Column(nullable = true)
 	private LocalDateTime updatedAt;
 
+	@Column(nullable = false)
+	private boolean deleted = false;
+
 	// 양방향 매핑으로 대댓글 리스트도 가능 (optional)
 	@OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
-	private List<Comment> replies = new ArrayList<>();
+	private List<TripComment> replies = new ArrayList<>();
 
 	public Long getId() {
 		return id;
@@ -94,11 +97,11 @@ public class Comment {
 		this.user = user;
 	}
 
-	public Comment getParent() {
+	public TripComment getParent() {
 		return parent;
 	}
 
-	public void setParent(Comment parent) {
+	public void setParent(TripComment parent) {
 		this.parent = parent;
 	}
 
@@ -118,11 +121,11 @@ public class Comment {
 		this.createdAt = createdAt;
 	}
 
-	public List<Comment> getReplies() {
+	public List<TripComment> getReplies() {
 		return replies;
 	}
 
-	public void setReplies(List<Comment> replies) {
+	public void setReplies(List<TripComment> replies) {
 		this.replies = replies;
 	}
 
@@ -132,5 +135,13 @@ public class Comment {
 
 	public void setUpdatedAt(LocalDateTime updatedAt) {
 		this.updatedAt = updatedAt;
+	}
+
+	public boolean isDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
 	}
 }

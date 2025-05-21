@@ -1,6 +1,6 @@
-package com.sharavel.sharavel_be.comments.dto;
+package com.sharavel.sharavel_be.tripComments.dto;
 
-public class CommentEditRequestDto {
+public class TripCommentEditRequestDto {
 	private String commentUid;
 	private String content;
 

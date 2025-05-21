@@ -1,12 +1,12 @@
-package com.sharavel.sharavel_be.comments.dto;
+package com.sharavel.sharavel_be.tripComments.dto;
 
-public class CommentRequestDto {
-	private String tripUid; // 어떤 Trip에 작성하는지
-	private String userUid; // 누가 작성하는지
-	private String content; // 댓글 내용
-	private String parentUid; // 대댓글일 경우 (optional)
+public class TripCommentRequestDto {
+	private String tripUid;
+	private String userUid;
+	private String content;
+	private String parentUid;
 
-	public CommentRequestDto(String tripUid, String userUid, String content, String parentUid) {
+	public TripCommentRequestDto(String tripUid, String userUid, String content, String parentUid) {
 		this.tripUid = tripUid;
 		this.userUid = userUid;
 		this.content = content;
