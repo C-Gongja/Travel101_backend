@@ -1,23 +1,25 @@
-package com.sharavel.sharavel_be.tripComments.dto;
+package com.sharavel.sharavel_be.comments.dto;
 
 import java.time.LocalDateTime;
 
-public class SingleTripCommentDto {
+public class CommentsResponseDto {
 	private String uid;
 	private String content;
-	private String userName;
+	private String username; // or userId, or both
 	private String userUid;
-	private LocalDateTime createdAt;
 	private String parentUid;
+	private LocalDateTime createdAt;
+	private Long childCount;
 
-	public SingleTripCommentDto(String uid, String content, String userName, String userUid, LocalDateTime createdAt,
-			String parentUid) {
+	public CommentsResponseDto(String uid, String content, String username, String userUid,
+			String parentUid, LocalDateTime createdAt, Long childCount) {
 		this.uid = uid;
 		this.content = content;
-		this.userName = userName;
+		this.username = username;
 		this.userUid = userUid;
-		this.createdAt = createdAt;
 		this.parentUid = parentUid;
+		this.createdAt = createdAt;
+		this.childCount = childCount;
 	}
 
 	public String getUid() {
@@ -36,12 +38,12 @@ public class SingleTripCommentDto {
 		this.content = content;
 	}
 
-	public String getUserName() {
-		return userName;
+	public String getUsername() {
+		return username;
 	}
 
-	public void setUserName(String userName) {
-		this.userName = userName;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
 	public String getUserUid() {
@@ -66,6 +68,14 @@ public class SingleTripCommentDto {
 
 	public void setParentUid(String parentUid) {
 		this.parentUid = parentUid;
+	}
+
+	public Long getChildCount() {
+		return childCount;
+	}
+
+	public void setChildCount(Long childCount) {
+		this.childCount = childCount;
 	}
 
 }

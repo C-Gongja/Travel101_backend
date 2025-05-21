@@ -1,7 +1,8 @@
-package com.sharavel.sharavel_be.tripComments.dto;
+package com.sharavel.sharavel_be.comments.dto;
 
-public class TripCommentEditRequestDto {
+public class CommentEditRequestDto {
 	private String commentUid;
+	private String targetType;
 	private String content;
 
 	public String getCommentUid() {
@@ -18,6 +19,14 @@ public class TripCommentEditRequestDto {
 
 	public void setContent(String content) {
 		this.content = content;
+	}
+
+	public String getTargetType() {
+		return targetType;
+	}
+
+	public void setTargetType(String targetType) {
+		this.targetType = targetType;
 	}
 
 }

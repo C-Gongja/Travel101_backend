@@ -3,7 +3,7 @@ package com.sharavel.sharavel_be.comment_likes.entity;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import com.sharavel.sharavel_be.tripComments.entity.TripComment;
+import com.sharavel.sharavel_be.comments.entity.Comment;
 import com.sharavel.sharavel_be.user.entity.Users;
 
 import jakarta.persistence.Column;
@@ -43,7 +43,7 @@ public class CommentLikes {
 	// 좋아요 누른 댓글
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "comment_id")
-	private TripComment comment;
+	private Comment comment;
 
 	private LocalDateTime likedAt;
 
@@ -71,11 +71,11 @@ public class CommentLikes {
 		this.user = user;
 	}
 
-	public TripComment getComment() {
+	public Comment getComment() {
 		return comment;
 	}
 
-	public void setComment(TripComment comment) {
+	public void setComment(Comment comment) {
 		this.comment = comment;
 	}
 

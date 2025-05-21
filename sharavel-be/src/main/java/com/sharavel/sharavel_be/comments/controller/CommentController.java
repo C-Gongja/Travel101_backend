@@ -1,4 +1,4 @@
-package com.sharavel.sharavel_be.tripComments.controller;
+package com.sharavel.sharavel_be.comments.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,19 +10,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sharavel.sharavel_be.tripComments.dto.TripCommentEditRequestDto;
-import com.sharavel.sharavel_be.tripComments.dto.TripCommentRequestDto;
-import com.sharavel.sharavel_be.tripComments.service.TripCommentService;
+import com.sharavel.sharavel_be.comments.dto.CommentEditRequestDto;
+import com.sharavel.sharavel_be.comments.dto.CommentRequestDto;
+import com.sharavel.sharavel_be.comments.service.CommentService;
 
 @RestController
 @RequestMapping("/api/comment")
-public class TripCommentController {
+public class CommentController {
 
 	@Autowired
-	private TripCommentService commentService;
+	private CommentService commentService;
 
 	@PostMapping("/addComment")
-	public ResponseEntity<?> addComment(@RequestBody TripCommentRequestDto newComment) {
+	public ResponseEntity<?> addComment(@RequestBody CommentRequestDto newComment) {
 		try {
 			return commentService.addComment(newComment);
 		} catch (Exception e) {
@@ -31,7 +31,7 @@ public class TripCommentController {
 	}
 
 	@PostMapping("/editComment")
-	public ResponseEntity<?> editComment(@RequestBody TripCommentEditRequestDto editComment) {
+	public ResponseEntity<?> editComment(@RequestBody CommentEditRequestDto editComment) {
 		try {
 			return commentService.editComment(editComment);
 		} catch (Exception e) {
@@ -40,7 +40,7 @@ public class TripCommentController {
 	}
 
 	@DeleteMapping("/deleteComment")
-	public ResponseEntity<?> deleteComment(@RequestParam TripCommentEditRequestDto deleteComment) {
+	public ResponseEntity<?> deleteComment(@RequestParam CommentEditRequestDto deleteComment) {
 		try {
 			return commentService.softDeleteComment(deleteComment);
 		} catch (Exception e) {

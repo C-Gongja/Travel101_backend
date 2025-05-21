@@ -1,11 +1,10 @@
-package com.sharavel.sharavel_be.tripComments.entity;
+package com.sharavel.sharavel_be.comments.entity;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import com.sharavel.sharavel_be.trip.entity.Trip;
 import com.sharavel.sharavel_be.user.entity.Users;
 
 import jakarta.persistence.CascadeType;
@@ -21,7 +20,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 
 @Entity
-public class TripComment {
+public class Comment {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(nullable = false)
@@ -37,9 +36,11 @@ public class TripComment {
 		}
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "trip_id")
-	private Trip trip;
+	@Column(nullable = false)
+	private String targetType;
+
+	@Column(nullable = false)
+	private String targetUid; // tripUid 또는 eventUid 등
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id")
@@ -47,7 +48,7 @@ public class TripComment {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "parent_id")
-	private TripComment parent;
+	private Comment parent;
 
 	@Column(nullable = false)
 	private String content;
@@ -63,7 +64,7 @@ public class TripComment {
 
 	// 양방향 매핑으로 대댓글 리스트도 가능 (optional)
 	@OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
-	private List<TripComment> replies = new ArrayList<>();
+	private List<Comment> replies = new ArrayList<>();
 
 	public Long getId() {
 		return id;
@@ -81,12 +82,20 @@ public class TripComment {
 		this.uid = uid;
 	}
 
-	public Trip getTrip() {
-		return trip;
+	public String getTargetType() {
+		return targetType;
 	}
 
-	public void setTrip(Trip trip) {
-		this.trip = trip;
+	public void setTargetType(String targetType) {
+		this.targetType = targetType;
+	}
+
+	public String getTargetUid() {
+		return targetUid;
+	}
+
+	public void setTargetUid(String targetUid) {
+		this.targetUid = targetUid;
 	}
 
 	public Users getUser() {
@@ -97,11 +106,11 @@ public class TripComment {
 		this.user = user;
 	}
 
-	public TripComment getParent() {
+	public Comment getParent() {
 		return parent;
 	}
 
-	public void setParent(TripComment parent) {
+	public void setParent(Comment parent) {
 		this.parent = parent;
 	}
 
@@ -121,11 +130,11 @@ public class TripComment {
 		this.createdAt = createdAt;
 	}
 
-	public List<TripComment> getReplies() {
+	public List<Comment> getReplies() {
 		return replies;
 	}
 
-	public void setReplies(List<TripComment> replies) {
+	public void setReplies(List<Comment> replies) {
 		this.replies = replies;
 	}
 
