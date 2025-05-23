@@ -27,16 +27,16 @@ public class CommentController {
 		try {
 			return commentService.addComment(newComment);
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("failed to post comment");
 		}
 	}
 
-	@PutMapping("/editComment")
-	public ResponseEntity<?> editComment(@RequestBody CommentEditRequestDto editComment) {
+	@PutMapping("/updateComment")
+	public ResponseEntity<?> updateComment(@RequestBody CommentEditRequestDto updateComment) {
 		try {
-			return commentService.editComment(editComment);
+			return commentService.updateComment(updateComment);
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("failed to update comment");
 		}
 	}
 
@@ -45,7 +45,7 @@ public class CommentController {
 		try {
 			return commentService.softDeleteComment(targetUid);
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("failed to delete comment");
 		}
 	}
 }

@@ -89,8 +89,8 @@ public class AuthServiceImpl implements AuthService {
 		response.addCookie(refreshCookie);
 
 		return ResponseEntity.ok(new AuthDto(
-				new AuthDto.UserInfo(userDetails.getUuid(), userDetails.getName(), userDetails.getPicture(),
-						userDetails.getAuthorities()),
+				new AuthDto.UserInfo(userDetails.getUuid(), userDetails.getName(), savedUser.getUsername(),
+						userDetails.getPicture(), userDetails.getAuthorities()),
 				accessToken));
 	}
 
@@ -120,8 +120,8 @@ public class AuthServiceImpl implements AuthService {
 			response.addCookie(refreshCookie);
 
 			return ResponseEntity.ok(new AuthDto(
-					new AuthDto.UserInfo(userDetails.getUuid(), userDetails.getName(), userDetails.getPicture(),
-							userDetails.getAuthorities()),
+					new AuthDto.UserInfo(userDetails.getUuid(), userDetails.getName(), user.getUsername(),
+							userDetails.getPicture(), userDetails.getAuthorities()),
 					accessToken));
 
 		} catch (Exception ex) {
@@ -166,8 +166,8 @@ public class AuthServiceImpl implements AuthService {
 			response.addCookie(refreshCookie);
 
 			return ResponseEntity.ok(new AuthDto(
-					new AuthDto.UserInfo(userDetails.getUuid(), userDetails.getName(), userDetails.getPicture(),
-							userDetails.getAuthorities()),
+					new AuthDto.UserInfo(userDetails.getUuid(), userDetails.getName(), user.getUsername(),
+							userDetails.getPicture(), userDetails.getAuthorities()),
 					newAccessToken));
 		} catch (Exception ex) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

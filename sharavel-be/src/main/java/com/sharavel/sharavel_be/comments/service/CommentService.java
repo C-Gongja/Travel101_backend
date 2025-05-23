@@ -8,7 +8,7 @@ import com.sharavel.sharavel_be.comments.dto.CommentRequestDto;
 public interface CommentService {
 	public ResponseEntity<?> addComment(CommentRequestDto newComment);
 
-	public ResponseEntity<?> editComment(CommentEditRequestDto editComment);
+	public ResponseEntity<?> updateComment(CommentEditRequestDto editComment);
 
 	public ResponseEntity<?> softDeleteComment(String targetUid);
 

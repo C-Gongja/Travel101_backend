@@ -5,17 +5,18 @@ import java.time.LocalDateTime;
 public class SingleCommentDto {
 	private String uid;
 	private String content;
-	private String userName;
-	private String userUid;
-	private LocalDateTime createdAt;
+	private String username;
+	private String targetUid;
 	private String parentUid;
+	private LocalDateTime createdAt;
 
-	public SingleCommentDto(String uid, String content, String userName, String userUid, LocalDateTime createdAt,
+	public SingleCommentDto(String uid, String content, String userName, String targetUid,
+			LocalDateTime createdAt,
 			String parentUid) {
 		this.uid = uid;
 		this.content = content;
-		this.userName = userName;
-		this.userUid = userUid;
+		this.username = userName;
+		this.targetUid = targetUid;
 		this.createdAt = createdAt;
 		this.parentUid = parentUid;
 	}
@@ -36,20 +37,20 @@ public class SingleCommentDto {
 		this.content = content;
 	}
 
-	public String getUserName() {
-		return userName;
+	public String getUsername() {
+		return username;
 	}
 
-	public void setUserName(String userName) {
-		this.userName = userName;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
-	public String getUserUid() {
-		return userUid;
+	public String getTargetUid() {
+		return targetUid;
 	}
 
-	public void setUserUid(String userUid) {
-		this.userUid = userUid;
+	public void setTargetUid(String targetUid) {
+		this.targetUid = targetUid;
 	}
 
 	public LocalDateTime getCreatedAt() {
@@ -66,6 +67,12 @@ public class SingleCommentDto {
 
 	public void setParentUid(String parentUid) {
 		this.parentUid = parentUid;
+	}
+
+	@Override
+	public String toString() {
+		return "SingleCommentDto [uid=" + uid + ", content=" + content + ", userName=" + username + ", targetUid="
+				+ targetUid + ", parentUid=" + parentUid + ", createdAt=" + createdAt + "]";
 	}
 
 }

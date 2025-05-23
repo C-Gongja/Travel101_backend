@@ -1,34 +1,24 @@
 package com.sharavel.sharavel_be.comments.dto;
 
 public class CommentRequestDto {
-	private String tripUid;
-	private String userUid;
+	private String targetUid;
 	private String targetType;
 	private String content;
 	private String parentUid;
 
-	public CommentRequestDto(String tripUid, String userUid, String targetType, String content, String parentUid) {
-		this.tripUid = tripUid;
-		this.userUid = userUid;
+	public CommentRequestDto(String targetUid, String targetType, String content, String parentUid) {
+		this.targetUid = targetUid;
 		this.targetType = targetType;
 		this.content = content;
 		this.parentUid = parentUid;
 	}
 
-	public String getTripUid() {
-		return tripUid;
+	public String getTargetUid() {
+		return targetUid;
 	}
 
-	public void setTripUid(String tripUid) {
-		this.tripUid = tripUid;
-	}
-
-	public String getUserUid() {
-		return userUid;
-	}
-
-	public void setUserUid(String userUid) {
-		this.userUid = userUid;
+	public void setTargetUid(String targetUid) {
+		this.targetUid = targetUid;
 	}
 
 	public String getTargetType() {

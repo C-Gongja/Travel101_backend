@@ -27,6 +27,16 @@ public class SocialLinkServiceImpl implements SocialLinkService {
 	@Autowired
 	private SocialLinkRepository socialLinkRepository;
 
+	private Users getCurrentUser() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication == null || !authentication.isAuthenticated()) {
+			throw new IllegalStateException("User not authenticated");
+		}
+		String email = authentication.getName();
+		return userRepository.findByEmail(email)
+				.orElseThrow(() -> new IllegalStateException("Current user not found"));
+	}
+
 	// SocialLink 객체 생성 메서드
 	private SocialLink buildSocialLink(SocialLinkDto socialLinkDto, Users user) {
 		SocialLink socialLink = new SocialLink();
@@ -39,22 +49,14 @@ public class SocialLinkServiceImpl implements SocialLinkService {
 	@Override
 	@Transactional
 	public ResponseEntity<?> setSocialLinks(List<SocialLinkDto> socialLinkDtoList) {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		if (authentication == null || !authentication.isAuthenticated()) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-					.body("User is not authenticated");
-		}
-
-		String email = authentication.getName();
-		Users user = userRepository.findByEmail(email)
-				.orElseThrow(() -> new IllegalStateException("User not found"));
+		Users currentUser = getCurrentUser();
 
 		// 기존 링크 삭제
-		socialLinkRepository.deleteByUser(user);
+		socialLinkRepository.deleteByUser(currentUser);
 
 		// 새로 저장
 		for (SocialLinkDto dto : socialLinkDtoList) {
-			SocialLink link = buildSocialLink(dto, user);
+			SocialLink link = buildSocialLink(dto, currentUser);
 			socialLinkRepository.save(link);
 		}
 

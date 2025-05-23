@@ -64,8 +64,8 @@ public class UserServiceImpl implements UserService {
 		String newAccessToken = jwtUtil.generateAccessToken(userDetails);
 
 		return ResponseEntity.ok(new AuthDto(
-				new AuthDto.UserInfo(userDetails.getUuid(), userDetails.getName(), userDetails.getPicture(),
-						userDetails.getAuthorities()),
+				new AuthDto.UserInfo(userDetails.getUuid(), userDetails.getName(), user.getUsername(),
+						userDetails.getPicture(), userDetails.getAuthorities()),
 				newAccessToken));
 	}
 

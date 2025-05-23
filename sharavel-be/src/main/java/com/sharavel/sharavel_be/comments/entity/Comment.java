@@ -40,7 +40,7 @@ public class Comment {
 	private String targetType;
 
 	@Column(nullable = false)
-	private String targetUid; // tripUid 또는 eventUid 등
+	private String targetUid;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id")

@@ -45,7 +45,7 @@ public class CommentServiceImpl implements CommentService {
 		Users currentUser = getCurrentUser();
 		Comment comment = new Comment();
 		comment.setTargetType(newComment.getTargetType());
-		comment.setTargetUid(newComment.getTripUid());
+		comment.setTargetUid(newComment.getTargetUid());
 		comment.setUser(currentUser);
 		comment.setContent(newComment.getContent());
 		comment.setCreatedAt(LocalDateTime.now());
@@ -58,25 +58,28 @@ public class CommentServiceImpl implements CommentService {
 		Comment saved = CommentRepository.save(comment);
 
 		SingleCommentDto responseDto = CommentMapper.toSingleCommentDto(saved);
+
 		return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
 	}
 
 	@Override
-	public ResponseEntity<?> editComment(CommentEditRequestDto editComment) {
-		System.out.println("!!!!!!!!!!!!!!editComment: " + editComment.toString());
+	public ResponseEntity<?> updateComment(CommentEditRequestDto updateComment) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		if (authentication == null || !authentication.isAuthenticated()) {
 			throw new IllegalStateException("User not authenticated");
 		}
-		Comment comment = CommentRepository.findByUid(editComment.getCommentUid())
+		Comment comment = CommentRepository.findByUid(updateComment.getUid())
 				.orElseThrow(() -> new IllegalStateException("Current comment not found"));
-		comment.setContent(editComment.getContent());
+		comment.setContent(updateComment.getContent());
 		comment.setUpdatedAt(LocalDateTime.now());
 
 		Comment saved = CommentRepository.save(comment);
 
 		SingleCommentDto responseDto = CommentMapper.toSingleCommentDto(saved);
-		return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
+
+		System.out.println(responseDto.toString());
+
+		return ResponseEntity.status(HttpStatus.ACCEPTED).body(responseDto);
 	}
 
 	@Override
@@ -91,7 +94,7 @@ public class CommentServiceImpl implements CommentService {
 		comment.setDeleted(true);
 		CommentRepository.save(comment);
 
-		return ResponseEntity.status(HttpStatus.CREATED).body("Comment successfully deleted");
+		return ResponseEntity.status(HttpStatus.ACCEPTED).body("Comment successfully deleted");
 	}
 
 	@Override

@@ -39,8 +39,8 @@ public class CommentMapper {
 				comment.getUid(),
 				comment.getContent(),
 				comment.getUser().getUsername(),
-				comment.getUser().getUuid(),
+				comment.getTargetUid(),
 				comment.getCreatedAt(),
-				comment.getParent().getUid());
+				comment.getParent() != null ? comment.getParent().getUid() : null);
 	}
 }

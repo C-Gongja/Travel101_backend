@@ -16,12 +16,15 @@ public class AuthDto {
 	public static class UserInfo {
 		private final String uuid;
 		private final String name;
+		private final String username;
 		private final String picture;
 		private final Collection<? extends GrantedAuthority> roles;
 
-		public UserInfo(String uuid, String name, String picture, Collection<? extends GrantedAuthority> roles) {
+		public UserInfo(String uuid, String name, String username, String picture,
+				Collection<? extends GrantedAuthority> roles) {
 			this.uuid = uuid;
 			this.name = name;
+			this.username = username;
 			this.picture = picture;
 			this.roles = roles;
 		}
@@ -33,6 +36,10 @@ public class AuthDto {
 
 		public String getName() {
 			return name;
+		}
+
+		public String getUsername() {
+			return username;
 		}
 
 		public Collection<? extends GrantedAuthority> getRoles() {

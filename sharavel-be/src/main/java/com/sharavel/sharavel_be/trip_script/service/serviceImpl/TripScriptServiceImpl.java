@@ -39,15 +39,22 @@ public class TripScriptServiceImpl implements TripScriptService {
 	@Autowired
 	private TripScriptRepository tripScriptRepository;
 
+	private Users getCurrentUser() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication == null || !authentication.isAuthenticated()) {
+			throw new IllegalStateException("User not authenticated");
+		}
+		String email = authentication.getName();
+		return userRepository.findByEmail(email)
+				.orElseThrow(() -> new IllegalStateException("Current user not found"));
+	}
+
 	@Override
 	public void scriptTrip(String tripUuid) {
 		Trip originalTrip = tripRepository.findByTripUid(tripUuid)
 				.orElseThrow(() -> new RuntimeException("Script Trip Trip not found"));
 
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		String email = authentication.getName();
-		Users user = userRepository.findByEmail(email)
-				.orElseThrow(() -> new IllegalStateException("Script Trip User not found"));
+		Users user = getCurrentUser();
 
 		// add script to og trip
 		originalTrip.setScripted(originalTrip.getScripted() + 1);

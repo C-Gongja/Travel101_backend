@@ -52,16 +52,19 @@ public class TripServiceImpl implements TripService {
 	@Autowired
 	private TripMapper tripMapper;
 
-	@Override
-	public TripDto createTrip(TripRequest tripDto) {
+	private Users getCurrentUser() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		if (authentication == null || !authentication.isAuthenticated()) {
-			throw new IllegalStateException("User is not authenticated");
+			throw new IllegalStateException("User not authenticated");
 		}
-
 		String email = authentication.getName();
-		Users user = userRepository.findByEmail(email)
-				.orElseThrow(() -> new IllegalStateException("Create Trip User not found"));
+		return userRepository.findByEmail(email)
+				.orElseThrow(() -> new IllegalStateException("Current user not found"));
+	}
+
+	@Override
+	public TripDto createTrip(TripRequest tripDto) {
+		Users user = getCurrentUser();
 
 		Trip trip = new Trip();
 		trip.setTripUid(UUID.randomUUID().toString());
@@ -91,10 +94,7 @@ public class TripServiceImpl implements TripService {
 		Trip scriptedTrip = tripRepository.findByTripUid(tripUuid)
 				.orElseThrow(() -> new RuntimeException("Script Trip Trip not found"));
 
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		String email = authentication.getName();
-		Users user = userRepository.findByEmail(email)
-				.orElseThrow(() -> new IllegalStateException("Script Trip User not found"));
+		Users user = getCurrentUser();
 
 		// add script to og trip
 		scriptedTrip.setScripted(scriptedTrip.getScripted() + 1);
@@ -204,14 +204,7 @@ public class TripServiceImpl implements TripService {
 
 	@Override
 	public TripDto putUpdatedTrip(String tripUid, TripRequest updatedTrip) {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		if (authentication == null || !authentication.isAuthenticated()) {
-			throw new IllegalStateException("User is not authenticated");
-		}
-
-		String email = authentication.getName();
-		Users user = userRepository.findByEmail(email)
-				.orElseThrow(() -> new IllegalStateException("putUpdatedTrip User not found"));
+		Users user = getCurrentUser();
 
 		Trip trip = tripRepository.findByTripUid(tripUid)
 				.orElseThrow(() -> new RuntimeException("putUpdatedTrip Trip not found"));
@@ -309,14 +302,7 @@ public class TripServiceImpl implements TripService {
 
 	@Override
 	public ResponseEntity<?> deleteTrip(String tripUuid) {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		if (authentication == null || !authentication.isAuthenticated()) {
-			throw new IllegalStateException("User is not authenticated");
-		}
-
-		String email = authentication.getName();
-		Users user = userRepository.findByEmail(email)
-				.orElseThrow(() -> new IllegalStateException("putUpdatedTrip User not found"));
+		Users user = getCurrentUser();
 
 		Trip trip = tripRepository.findByTripUid(tripUuid)
 				.orElseThrow(() -> new RuntimeException("deleteTrip Trip not found"));

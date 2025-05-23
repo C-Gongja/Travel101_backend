@@ -1,15 +1,40 @@
 package com.sharavel.sharavel_be.comments.dto;
 
-public class CommentEditRequestDto {
-	private String commentUid;
-	private String content;
+// uid: originalComment.uid,
+// targetType: targetType,
+// targetUid: targetUid,
+// content: newCommentText.trim(),
+// parentUid: originalComment.parentUid || null,
 
-	public String getCommentUid() {
-		return commentUid;
+public class CommentEditRequestDto {
+	private String uid;
+	private String targetType;
+	private String targetUid;
+	private String content;
+	private String parentUid;
+
+	public String getUid() {
+		return uid;
 	}
 
-	public void setCommentUid(String commentUid) {
-		this.commentUid = commentUid;
+	public void setUid(String uid) {
+		this.uid = uid;
+	}
+
+	public String getTargetType() {
+		return targetType;
+	}
+
+	public void setTargetType(String targetType) {
+		this.targetType = targetType;
+	}
+
+	public String getTargetUid() {
+		return targetUid;
+	}
+
+	public void setTargetUid(String targetUid) {
+		this.targetUid = targetUid;
 	}
 
 	public String getContent() {
@@ -20,10 +45,17 @@ public class CommentEditRequestDto {
 		this.content = content;
 	}
 
-	@Override
-	public String toString() {
-		return "CommentEditRequestDto [commentUid=" + commentUid + ", content=" + content + "]";
+	public String getParentUid() {
+		return parentUid;
 	}
 
-	
+	public void setParentUid(String parentUid) {
+		this.parentUid = parentUid;
+	}
+
+	@Override
+	public String toString() {
+		return "CommentEditRequestDto [commentUid=" + uid + ", content=" + content + "]";
+	}
+
 }
