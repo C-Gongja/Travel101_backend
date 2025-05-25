@@ -4,18 +4,31 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.sharavel.sharavel_be.comments.repository.CommentRepository;
 import com.sharavel.sharavel_be.countries.dto.CountryDto;
+import com.sharavel.sharavel_be.likes.repository.LikesRepository;
 import com.sharavel.sharavel_be.trip.dto.DaysDto;
 import com.sharavel.sharavel_be.trip.dto.LocationDto;
 import com.sharavel.sharavel_be.trip.dto.TripDto;
 import com.sharavel.sharavel_be.trip.dto.TripListDto;
 import com.sharavel.sharavel_be.trip.entity.Trip;
+import com.sharavel.sharavel_be.user.entity.Users;
 
 @Component
 public class TripMapper {
-	public TripDto toDto(Trip trip) {
+	@Autowired
+	private CommentRepository commentRepository;
+	@Autowired
+	private LikesRepository likesRepository;
+
+	public TripDto toDto(Trip trip, Users user) {
+		boolean isLiked = likesRepository.existsByTargetTypeAndTargetUidAndUser("TRIP", trip.getTripUid(), user);
+		Long tripLikesCount = likesRepository.countByTargetTypeAndTargetUid("TRIP", trip.getTripUid());
+		Long tripCommentCount = commentRepository.countByTargetTypeAndTargetUidAndDeletedFalse("TRIP", trip.getTripUid());
+
 		TripDto tripDto = new TripDto();
 		tripDto.setTripUid(trip.getTripUid()); // Use UUID as the identifier instead of internal ID
 		tripDto.setName(trip.getName());
@@ -48,10 +61,17 @@ public class TripMapper {
 				.collect(Collectors.toList());
 
 		tripDto.setDays(dayDtos);
+		tripDto.setIsLiked(isLiked);
+		tripDto.setCommentsCount(tripCommentCount);
+		tripDto.setLikesCount(tripLikesCount);
+		tripDto.setScriptedCount(null);
 		return tripDto;
 	}
 
 	public TripListDto toListDto(Trip trip) {
+		Long tripCommentCount = commentRepository.countByTargetTypeAndTargetUidAndDeletedFalse("TRIP", trip.getTripUid());
+		Long tripLikesCount = likesRepository.countByTargetTypeAndTargetUid("TRIP", trip.getTripUid());
+
 		TripListDto tripListDto = new TripListDto();
 		tripListDto.setTripUid(trip.getTripUid());
 		tripListDto.setName(trip.getName());
@@ -63,7 +83,9 @@ public class TripMapper {
 						.map(CountryDto::new) // Convert Country to CountryDto using the constructor
 						.collect(Collectors.toList()));
 		tripListDto.setIsCompleted(trip.isCompleted());
-		tripListDto.setScripted(trip.getScripted());
+		tripListDto.setScriptedCount(trip.getScripted());
+		tripListDto.setLikesCount(tripLikesCount);
+		tripListDto.setCommentsCount(tripCommentCount);
 		return tripListDto;
 	}
 }

@@ -1,6 +1,5 @@
 package com.sharavel.sharavel_be.trip.dto;
 
-import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -14,13 +13,15 @@ public class TripListDto {
 	private LocalDate endDate;
 	private List<CountryDto> countries;
 	private boolean isCompleted;
-	private Long scripted;
+	private Long likesCount;
+	private Long commentsCount;
+	private Long scriptedCount;
 
 	public TripListDto() {
 	}
 
 	public TripListDto(String tripUid, String name, String username, LocalDate startDate, LocalDate endDate,
-			List<CountryDto> countries, boolean isCompleted, Long scripted) {
+			List<CountryDto> countries, boolean isCompleted, Long scriptedCount) {
 		this.tripUid = tripUid;
 		this.username = username;
 		this.name = name;
@@ -28,7 +29,7 @@ public class TripListDto {
 		this.endDate = endDate;
 		this.countries = countries;
 		this.isCompleted = isCompleted;
-		this.scripted = scripted;
+		this.scriptedCount = scriptedCount;
 	}
 
 	// get trip uid
@@ -80,12 +81,28 @@ public class TripListDto {
 		this.countries = countries;
 	}
 
-	public Long getScripted() {
-		return scripted;
+	public Long getLikesCount() {
+		return likesCount;
 	}
 
-	public void setScripted(Long scripted) {
-		this.scripted = scripted;
+	public void setLikesCount(Long likesCount) {
+		this.likesCount = likesCount;
+	}
+
+	public Long getCommentsCount() {
+		return commentsCount;
+	}
+
+	public void setCommentsCount(Long commentsCount) {
+		this.commentsCount = commentsCount;
+	}
+
+	public Long getScriptedCount() {
+		return scriptedCount;
+	}
+
+	public void setScriptedCount(Long scriptedCount) {
+		this.scriptedCount = scriptedCount;
 	}
 
 	public boolean isIsCompleted() {
@@ -103,7 +120,7 @@ public class TripListDto {
 				"tripName=" + name +
 				", startDate=" + startDate +
 				", endDate=" + endDate +
-				", scripted=" + scripted +
+				", scripted=" + scriptedCount +
 				", countries=" + countries +
 				'}';
 	}

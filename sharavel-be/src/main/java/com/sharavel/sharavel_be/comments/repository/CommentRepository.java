@@ -25,4 +25,10 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
 	// 특정 대상의 모든 댓글 (필요 시)
 	List<Comment> findByTargetTypeAndTargetUidOrderByCreatedAtAsc(String targetType, String targetUid);
+
+	Long countByTargetTypeAndTargetUidAndDeletedFalse(String targetType, String targetUid);
+
+	boolean existsByTargetTypeAndTargetUid(String targetType, String targetUid);
+
+	boolean existsByUid(String uid);
 }

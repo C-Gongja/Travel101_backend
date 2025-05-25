@@ -11,7 +11,11 @@ public class TripDto {
 	private LocalDate startDate;
 	private LocalDate endDate;
 	private boolean isCompleted;
+	private boolean isLiked;
 	private Long scripted;
+	private Long likesCount;
+	private Long scriptedCount;
+	private Long commentsCount;
 	private List<CountryDto> countries;
 	private List<DaysDto> days;
 
@@ -49,6 +53,38 @@ public class TripDto {
 
 	public void setEndDate(LocalDate endDate) {
 		this.endDate = endDate;
+	}
+
+	public void setIsLiked(boolean isLiked) {
+		this.isLiked = isLiked;
+	}
+
+	public boolean getIsLiked() {
+		return isLiked;
+	}
+
+	public Long getLikesCount() {
+		return likesCount;
+	}
+
+	public void setLikesCount(Long likesCount) {
+		this.likesCount = likesCount;
+	}
+
+	public Long getScriptedCount() {
+		return scriptedCount;
+	}
+
+	public void setScriptedCount(Long scriptedCount) {
+		this.scriptedCount = scriptedCount;
+	}
+
+	public Long getCommentsCount() {
+		return commentsCount;
+	}
+
+	public void setCommentsCount(Long commentsCount) {
+		this.commentsCount = commentsCount;
 	}
 
 	public boolean isCompleted() {

@@ -1,6 +1,7 @@
 package com.sharavel.sharavel_be.trip_script.service.serviceImpl;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Set;
@@ -106,10 +107,10 @@ public class TripScriptServiceImpl implements TripScriptService {
 		script.setTrip(trip); // 복사본
 		script.setCopiedTrip(originalTrip); // 원본
 		script.setScriptUser(user);
-
-		tripScriptRepository.save(script);
+		script.setScriptedAt(LocalDateTime.now());
 
 		tripRepository.save(trip);
+		tripScriptRepository.save(script);
 	}
 
 	@Override

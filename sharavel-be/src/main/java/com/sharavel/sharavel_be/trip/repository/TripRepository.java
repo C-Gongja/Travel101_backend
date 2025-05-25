@@ -13,6 +13,8 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
 	@Override
 	Optional<Trip> findById(Long id);
 
+	boolean existsByTripUid(String tripUid);
+
 	Optional<Trip> findByTripUid(String tripUid);
 
 	// findByUid만 하면 UserEntity 객체를 직접 받아야 해서 보통 findByUid_Id를 사용함.

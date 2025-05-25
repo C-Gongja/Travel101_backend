@@ -86,7 +86,7 @@ public class TripServiceImpl implements TripService {
 		trip.setDays(days);
 		Trip savedTrip = tripRepository.save(trip);
 
-		return tripMapper.toDto(savedTrip);
+		return tripMapper.toDto(savedTrip, user);
 	}
 
 	@Override
@@ -172,7 +172,7 @@ public class TripServiceImpl implements TripService {
 		UserSnippetDto userSnippet = new UserSnippetDto(tripOwner.getUuid(), tripOwner.getName(),
 				tripOwner.getUsername(), isFollowing);
 
-		TripResponse response = new TripResponse(tripMapper.toDto(trip), isEditable, userSnippet);
+		TripResponse response = new TripResponse(tripMapper.toDto(trip, currentUser), isEditable, userSnippet);
 
 		return response;
 	}
@@ -180,7 +180,6 @@ public class TripServiceImpl implements TripService {
 	@Override
 	public List<TripListDto> getAllTrips() {
 		List<Trip> allTrips = tripRepository.findAll(); // Trip 엔티티를 가져왔다고 가정
-
 		List<TripListDto> filteredTrips = allTrips.stream()
 				.map(trip -> (TripListDto) tripMapper.toListDto(trip))
 				.collect(Collectors.toList());
@@ -291,7 +290,7 @@ public class TripServiceImpl implements TripService {
 		}
 		Trip savedTrip = tripRepository.save(trip);
 
-		return tripMapper.toDto(savedTrip);
+		return tripMapper.toDto(savedTrip, user);
 	}
 
 	@Override

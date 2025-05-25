@@ -1,9 +1,8 @@
-package com.sharavel.sharavel_be.trip_likes.entity;
+package com.sharavel.sharavel_be.likes.entity;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import com.sharavel.sharavel_be.trip.entity.Trip;
 import com.sharavel.sharavel_be.user.entity.Users;
 
 import jakarta.persistence.Column;
@@ -15,11 +14,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "trip_likes")
-public class TripLikes {
+public class Likes {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -34,17 +31,18 @@ public class TripLikes {
 		}
 	}
 
+	@Column(nullable = false)
+	private String targetType;
+
+	@Column(nullable = false)
+	private String targetUid;
+
 	// 좋아요 누른 유저
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id")
 	private Users user;
 
-	// 좋아요 누른 trip
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "trip_id")
-	private Trip trip;
-
-	private LocalDateTime likedAt;
+	private LocalDateTime createdAt;
 
 	public Long getId() {
 		return id;
@@ -62,6 +60,22 @@ public class TripLikes {
 		this.uid = uid;
 	}
 
+	public String getTargetType() {
+		return targetType;
+	}
+
+	public void setTargetType(String targetType) {
+		this.targetType = targetType;
+	}
+
+	public String getTargetUid() {
+		return targetUid;
+	}
+
+	public void setTargetUid(String targetUid) {
+		this.targetUid = targetUid;
+	}
+
 	public Users getUser() {
 		return user;
 	}
@@ -70,19 +84,11 @@ public class TripLikes {
 		this.user = user;
 	}
 
-	public Trip getTrip() {
-		return trip;
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
 	}
 
-	public void setTrip(Trip trip) {
-		this.trip = trip;
-	}
-
-	public LocalDateTime getLikedAt() {
-		return likedAt;
-	}
-
-	public void setLikedAt(LocalDateTime likedAt) {
-		this.likedAt = likedAt;
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
 	}
 }

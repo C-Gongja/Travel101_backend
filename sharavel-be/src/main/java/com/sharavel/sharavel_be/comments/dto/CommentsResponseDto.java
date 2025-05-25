@@ -9,16 +9,20 @@ public class CommentsResponseDto {
 	private String userUid;
 	private String parentUid;
 	private LocalDateTime createdAt;
+	private boolean isLiked;
+	private Long likesCount;
 	private Long childCount;
 
 	public CommentsResponseDto(String uid, String content, String username, String userUid,
-			String parentUid, LocalDateTime createdAt, Long childCount) {
+			String parentUid, LocalDateTime createdAt, boolean isLiked, Long likesCount, Long childCount) {
 		this.uid = uid;
 		this.content = content;
 		this.username = username;
 		this.userUid = userUid;
 		this.parentUid = parentUid;
 		this.createdAt = createdAt;
+		this.isLiked = isLiked;
+		this.likesCount = likesCount;
 		this.childCount = childCount;
 	}
 
@@ -68,6 +72,22 @@ public class CommentsResponseDto {
 
 	public void setParentUid(String parentUid) {
 		this.parentUid = parentUid;
+	}
+
+	public boolean isLiked() {
+		return isLiked;
+	}
+
+	public void setIsLiked(boolean isLiked) {
+		this.isLiked = isLiked;
+	}
+
+	public Long getLikesCount() {
+		return likesCount;
+	}
+
+	public void setLikesCount(Long likesCount) {
+		this.likesCount = likesCount;
 	}
 
 	public Long getChildCount() {

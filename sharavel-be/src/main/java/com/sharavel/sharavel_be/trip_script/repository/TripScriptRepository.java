@@ -1,8 +1,5 @@
 package com.sharavel.sharavel_be.trip_script.repository;
 
-import java.util.List;
-import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

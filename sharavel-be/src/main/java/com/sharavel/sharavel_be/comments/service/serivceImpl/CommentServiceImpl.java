@@ -28,7 +28,10 @@ public class CommentServiceImpl implements CommentService {
 	private UserRepository userRepository;
 
 	@Autowired
-	private CommentRepository CommentRepository;
+	private CommentRepository commentRepository;
+
+	@Autowired
+	private CommentMapper commentMapper;
 
 	private Users getCurrentUser() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -38,6 +41,16 @@ public class CommentServiceImpl implements CommentService {
 		String email = authentication.getName();
 		return userRepository.findByEmail(email)
 				.orElseThrow(() -> new IllegalStateException("Current user not found"));
+	}
+
+	private Users getCurrentUserNullable() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication == null || !authentication.isAuthenticated() ||
+				"anonymousUser".equals(authentication.getPrincipal())) {
+			return null;
+		}
+		String email = authentication.getName();
+		return userRepository.findByEmail(email).orElse(null);
 	}
 
 	@Override
@@ -51,13 +64,13 @@ public class CommentServiceImpl implements CommentService {
 		comment.setCreatedAt(LocalDateTime.now());
 		// 대댓글일 경우 parent 설정
 		if (newComment.getParentUid() != null) {
-			Comment parent = CommentRepository.findByUid(newComment.getParentUid())
+			Comment parent = commentRepository.findByUid(newComment.getParentUid())
 					.orElseThrow(() -> new IllegalArgumentException("Parent comment not found"));
 			comment.setParent(parent);
 		}
-		Comment saved = CommentRepository.save(comment);
+		Comment saved = commentRepository.save(comment);
 
-		SingleCommentDto responseDto = CommentMapper.toSingleCommentDto(saved);
+		SingleCommentDto responseDto = commentMapper.toSingleCommentDto(saved);
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
 	}
@@ -68,14 +81,14 @@ public class CommentServiceImpl implements CommentService {
 		if (authentication == null || !authentication.isAuthenticated()) {
 			throw new IllegalStateException("User not authenticated");
 		}
-		Comment comment = CommentRepository.findByUid(updateComment.getUid())
+		Comment comment = commentRepository.findByUid(updateComment.getUid())
 				.orElseThrow(() -> new IllegalStateException("Current comment not found"));
 		comment.setContent(updateComment.getContent());
 		comment.setUpdatedAt(LocalDateTime.now());
 
-		Comment saved = CommentRepository.save(comment);
+		Comment saved = commentRepository.save(comment);
 
-		SingleCommentDto responseDto = CommentMapper.toSingleCommentDto(saved);
+		SingleCommentDto responseDto = commentMapper.toSingleCommentDto(saved);
 
 		System.out.println(responseDto.toString());
 
@@ -88,22 +101,23 @@ public class CommentServiceImpl implements CommentService {
 		if (authentication == null || !authentication.isAuthenticated()) {
 			throw new IllegalStateException("User not authenticated");
 		}
-		Comment comment = CommentRepository.findByUid(targetUid)
+		Comment comment = commentRepository.findByUid(targetUid)
 				.orElseThrow(() -> new IllegalStateException("Current comment not found"));
 
 		comment.setDeleted(true);
-		CommentRepository.save(comment);
+		commentRepository.save(comment);
 
 		return ResponseEntity.status(HttpStatus.ACCEPTED).body("Comment successfully deleted");
 	}
 
 	@Override
 	public ResponseEntity<?> getRootComments(String targetType, String targetUid) {
-		List<Comment> rootComments = CommentRepository
+		Users currentUser = getCurrentUserNullable();
+		List<Comment> rootComments = commentRepository
 				.findByTargetTypeAndTargetUidAndParentIsNullAndDeletedFalseOrderByCreatedAtAsc(targetType, targetUid);
 
 		List<CommentsResponseDto> response = rootComments.stream()
-				.map(comment -> CommentMapper.toCommentsResponseDtoWithoutReplies(comment, CommentRepository))
+				.map(comment -> commentMapper.toCommentsResponseDtoWithoutReplies(comment, currentUser))
 				.collect(Collectors.toList());
 
 		return ResponseEntity.ok(response);
@@ -111,14 +125,15 @@ public class CommentServiceImpl implements CommentService {
 
 	@Override
 	public ResponseEntity<?> getReplies(String parentUid) {
-		Comment parent = CommentRepository.findByUid(parentUid)
+		Users currentUser = getCurrentUserNullable();
+		Comment parent = commentRepository.findByUid(parentUid)
 				.orElseThrow(() -> new RuntimeException("Parent comment not found"));
 
-		List<Comment> replies = CommentRepository
+		List<Comment> replies = commentRepository
 				.findByParentAndDeletedFalseOrderByCreatedAtAsc(parent);
 
 		List<CommentsResponseDto> response = replies.stream()
-				.map(comment -> CommentMapper.toCommentsResponseDtoWithoutReplies(comment, CommentRepository))
+				.map(comment -> commentMapper.toCommentsResponseDtoWithoutReplies(comment, currentUser))
 				.collect(Collectors.toList());
 
 		return ResponseEntity.ok(response);
