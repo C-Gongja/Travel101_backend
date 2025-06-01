@@ -11,7 +11,5 @@ import com.sharavel.sharavel_be.user.entity.Users;
 public interface TripScriptRepository extends JpaRepository<TripScript, Long> {
 	Long countByTrip(Trip trip);
 
-	Long countByCopiedTrip(Trip trip);
-
 	Long countByScriptUser(Users scriptUser);
 }

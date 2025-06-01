@@ -31,7 +31,7 @@ public class TripMapper {
 		boolean isLiked = likesRepository.existsByTargetTypeAndTargetUidAndUser("TRIP", trip.getTripUid(), user);
 		Long tripLikesCount = likesRepository.countByTargetTypeAndTargetUid("TRIP", trip.getTripUid());
 		Long tripCommentCount = commentRepository.countByTargetTypeAndTargetUidAndDeletedFalse("TRIP", trip.getTripUid());
-		Long tripScriptCount = tripScriptRepository.countByCopiedTrip(trip);
+		Long tripScriptCount = tripScriptRepository.countByTrip(trip);
 
 		TripDto tripDto = new TripDto();
 		tripDto.setTripUid(trip.getTripUid()); // Use UUID as the identifier instead of internal ID
@@ -75,6 +75,7 @@ public class TripMapper {
 	public TripListDto toListDto(Trip trip) {
 		Long tripCommentCount = commentRepository.countByTargetTypeAndTargetUidAndDeletedFalse("TRIP", trip.getTripUid());
 		Long tripLikesCount = likesRepository.countByTargetTypeAndTargetUid("TRIP", trip.getTripUid());
+		Long tripScriptCount = tripScriptRepository.countByTrip(trip);
 
 		TripListDto tripListDto = new TripListDto();
 		tripListDto.setTripUid(trip.getTripUid());
@@ -87,7 +88,7 @@ public class TripMapper {
 						.map(CountryDto::new) // Convert Country to CountryDto using the constructor
 						.collect(Collectors.toList()));
 		tripListDto.setIsCompleted(trip.isCompleted());
-		tripListDto.setScriptedCount(trip.getScripted());
+		tripListDto.setScriptedCount(tripScriptCount);
 		tripListDto.setLikesCount(tripLikesCount);
 		tripListDto.setCommentsCount(tripCommentCount);
 		return tripListDto;

@@ -27,7 +27,7 @@ public class Days {
 	@JoinColumn(name = "trip_id", nullable = false)
 	private Trip trip;
 
-	@OneToMany(mappedBy = "dayId", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "day", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Locations> locations = new ArrayList<>();
 
 	public Long getId() {

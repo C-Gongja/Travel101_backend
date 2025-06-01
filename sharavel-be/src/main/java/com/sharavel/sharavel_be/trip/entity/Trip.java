@@ -42,7 +42,7 @@ public class Trip {
 	@JoinColumn(name = "user_id", nullable = false)
 	private Users uid;
 
-	@OneToMany(mappedBy = "tripId", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Days> days = new ArrayList<>();
 
 	@Column(nullable = false)

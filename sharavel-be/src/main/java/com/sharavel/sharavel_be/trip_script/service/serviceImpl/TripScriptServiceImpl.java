@@ -133,7 +133,7 @@ public class TripScriptServiceImpl implements TripScriptService {
 	public void scriptDay(String tripUid, Integer dayNum, String targetTripUid) {
 		Users user = getCurrentUser();
 
-		Days originalDay = daysRepository.findByTrip_UidAndNumber(tripUid, dayNum);
+		Days originalDay = daysRepository.findByTrip_TripUidAndNumber(tripUid, dayNum);
 		Trip targetTrip = tripRepository.findByTripUid(targetTripUid)
 				.orElseThrow(() -> new RuntimeException("Trip not found"));
 
@@ -185,12 +185,12 @@ public class TripScriptServiceImpl implements TripScriptService {
 			Integer targetDayNum) {
 		Users user = getCurrentUser();
 
-		Days originalDay = daysRepository.findByTrip_UidAndNumber(tripUid, dayNum);
+		Days originalDay = daysRepository.findByTrip_TripUidAndNumber(tripUid, dayNum);
 		Locations ogLoc = locationRepository.findByDay(originalDay);
 
 		Trip targetTrip = tripRepository.findByTripUid(targetTripUid)
 				.orElseThrow(() -> new RuntimeException("Trip not found"));
-		Days targetDay = daysRepository.findByTrip_UidAndNumber(targetTrip.getTripUid(), targetDayNum);
+		Days targetDay = daysRepository.findByTrip_TripUidAndNumber(targetTrip.getTripUid(), targetDayNum);
 
 		List<Locations> targetLoc = targetDay.getLocations();
 
