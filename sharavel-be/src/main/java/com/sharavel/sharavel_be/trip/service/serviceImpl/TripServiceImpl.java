@@ -77,7 +77,7 @@ public class TripServiceImpl implements TripService {
 
 		List<Days> days = tripDto.getDays().stream().map(dayDto -> {
 			Days day = new Days();
-			day.setTripId(trip);
+			day.setTrip(trip);
 			day.setNumber(dayDto.getNumber());
 			day.setLocations(new ArrayList<>()); // No locations at creation
 			return day;
@@ -87,61 +87,6 @@ public class TripServiceImpl implements TripService {
 		Trip savedTrip = tripRepository.save(trip);
 
 		return tripMapper.toDto(savedTrip, user);
-	}
-
-	@Override
-	public void scriptTrip(String tripUuid) {
-		Trip scriptedTrip = tripRepository.findByTripUid(tripUuid)
-				.orElseThrow(() -> new RuntimeException("Script Trip Trip not found"));
-
-		Users user = getCurrentUser();
-
-		// add script to og trip
-		scriptedTrip.setScripted(scriptedTrip.getScripted() + 1);
-		tripRepository.save(scriptedTrip);
-
-		Trip trip = new Trip();
-		trip.setTripUid(UUID.randomUUID().toString());
-		trip.setUid(user);
-		trip.setName(scriptedTrip.getName());
-
-		Set<Country> countries = scriptedTrip.getCountries().stream()
-				.map(codeDto -> countryRepository.findByIso2(codeDto.getIso2())
-						.orElseThrow(() -> new RuntimeException("Country not found: " + codeDto.getIso2())))
-				.collect(Collectors.toSet());
-
-		LocalDate today = LocalDate.now();
-		int scriptedTripDays = (int) ChronoUnit.DAYS.between(scriptedTrip.getStartDate(), scriptedTrip.getEndDate());
-		trip.setStartDate(today);
-		trip.setEndDate(today.plusDays(scriptedTripDays));
-
-		trip.setCompleted(false);
-		trip.setCountries(countries);
-		trip.setScripted(0L);
-
-		List<Days> days = scriptedTrip.getDays().stream().map(originalDay -> {
-			Days newDay = new Days();
-			newDay.setTripId(trip);
-			newDay.setNumber(originalDay.getNumber());
-
-			List<Locations> newLocations = originalDay.getLocations().stream().map(originalLoc -> {
-				Locations newLoc = new Locations();
-				newLoc.setDayId(newDay);
-				newLoc.setNumber(originalLoc.getNumber());
-				newLoc.setName(originalLoc.getName());
-				newLoc.setLongitude(originalLoc.getLongitude());
-				newLoc.setLatitude(originalLoc.getLatitude());
-				newLoc.setDescription(originalLoc.getDescription());
-				return newLoc;
-			}).collect(Collectors.toList());
-
-			newDay.setLocations(newLocations);
-			return newDay;
-		}).collect(Collectors.toList());
-
-		trip.setDays(days);
-
-		tripRepository.save(trip);
 	}
 
 	@Override
@@ -253,7 +198,7 @@ public class TripServiceImpl implements TripService {
 
 		for (DaysDto dayDto : updatedTrip.getDays()) {
 			Days day = existingDaysMap.getOrDefault(dayDto.getNumber(), new Days());
-			day.setTripId(trip);
+			day.setTrip(trip);
 			day.setNumber(dayDto.getNumber());
 
 			Map<Integer, Locations> existingLocationsMap = day.getLocations().stream()
@@ -262,7 +207,7 @@ public class TripServiceImpl implements TripService {
 
 			for (LocationDto locDto : dayDto.getLocations()) {
 				Locations location = existingLocationsMap.getOrDefault(locDto.getNumber(), new Locations());
-				location.setDayId(day);
+				location.setDay(day);
 				location.setNumber(locDto.getNumber());
 				location.setName(locDto.getName());
 				location.setLongitude(locDto.getLongitude());

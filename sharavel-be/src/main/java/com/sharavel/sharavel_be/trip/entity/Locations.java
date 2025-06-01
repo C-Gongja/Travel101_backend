@@ -19,7 +19,7 @@ public class Locations {
 
 	@ManyToOne
 	@JoinColumn(name = "day_id", nullable = false)
-	private Days dayId;
+	private Days day;
 
 	@Column(nullable = true)
 	private Integer number;
@@ -44,12 +44,12 @@ public class Locations {
 		this.id = id;
 	}
 
-	public Days getDayId() {
-		return dayId;
+	public Days getDay() {
+		return day;
 	}
 
-	public void setDayId(Days dayId) {
-		this.dayId = dayId;
+	public void setDay(Days day) {
+		this.day = day;
 	}
 
 	public Integer getNumber() {

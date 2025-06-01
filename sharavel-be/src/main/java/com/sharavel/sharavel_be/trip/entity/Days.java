@@ -25,7 +25,7 @@ public class Days {
 
 	@ManyToOne
 	@JoinColumn(name = "trip_id", nullable = false)
-	private Trip tripId;
+	private Trip trip;
 
 	@OneToMany(mappedBy = "dayId", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Locations> locations = new ArrayList<>();
@@ -38,12 +38,12 @@ public class Days {
 		this.id = id;
 	}
 
-	public Trip getTripId() {
-		return tripId;
+	public Trip getTrip() {
+		return trip;
 	}
 
-	public void setTripId(Trip tripId) {
-		this.tripId = tripId;
+	public void setTrip(Trip trip) {
+		this.trip = trip;
 	}
 
 	public Integer getNumber() {

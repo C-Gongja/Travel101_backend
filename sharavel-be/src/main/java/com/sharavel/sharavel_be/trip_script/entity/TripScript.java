@@ -3,6 +3,8 @@ package com.sharavel.sharavel_be.trip_script.entity;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.sharavel.sharavel_be.trip.entity.Days;
+import com.sharavel.sharavel_be.trip.entity.Locations;
 import com.sharavel.sharavel_be.trip.entity.Trip;
 import com.sharavel.sharavel_be.user.entity.Users;
 
@@ -33,17 +35,24 @@ public class TripScript {
 		}
 	}
 
+	@Column(nullable = false)
+	private String type; // "TRIP", "DAY", "LOCATION" 등
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "trip_id")
 	private Trip trip;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id")
-	private Users scriptUser;
+	@JoinColumn(name = "day_id")
+	private Days day;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "copied_trip_id")
-	private Trip copiedTrip;
+	@JoinColumn(name = "location_id")
+	private Locations location;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id")
+	private Users scriptUser;
 
 	private LocalDateTime scriptedAt;
 
@@ -87,12 +96,28 @@ public class TripScript {
 		this.scriptedAt = scriptedAt;
 	}
 
-	public Trip getCopiedTrip() {
-		return copiedTrip;
+	public Days getDay() {
+		return day;
 	}
 
-	public void setCopiedTrip(Trip copiedTrip) {
-		this.copiedTrip = copiedTrip;
+	public void setDay(Days day) {
+		this.day = day;
+	}
+
+	public Locations getLocation() {
+		return location;
+	}
+
+	public void setLocation(Locations location) {
+		this.location = location;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 
 }

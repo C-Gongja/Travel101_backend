@@ -60,7 +60,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 				byte[] decodedBytes = Base64.getUrlDecoder().decode(state);
 				redirectUrl = new String(decodedBytes, StandardCharsets.UTF_8);
 
-				// redirectUrl에 토큰 추가 (프론트엔드에서 사용할 수 있도록)
+				// // redirectUrl에 토큰 추가 (프론트엔드에서 사용할 수 있도록)
 				if (redirectUrl.contains("?")) {
 					redirectUrl += "&token=" + accessToken;
 				} else {

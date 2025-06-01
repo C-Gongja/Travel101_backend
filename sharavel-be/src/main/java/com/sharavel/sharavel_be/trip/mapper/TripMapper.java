@@ -15,6 +15,7 @@ import com.sharavel.sharavel_be.trip.dto.LocationDto;
 import com.sharavel.sharavel_be.trip.dto.TripDto;
 import com.sharavel.sharavel_be.trip.dto.TripListDto;
 import com.sharavel.sharavel_be.trip.entity.Trip;
+import com.sharavel.sharavel_be.trip_script.repository.TripScriptRepository;
 import com.sharavel.sharavel_be.user.entity.Users;
 
 @Component
@@ -23,11 +24,14 @@ public class TripMapper {
 	private CommentRepository commentRepository;
 	@Autowired
 	private LikesRepository likesRepository;
+	@Autowired
+	private TripScriptRepository tripScriptRepository;
 
 	public TripDto toDto(Trip trip, Users user) {
 		boolean isLiked = likesRepository.existsByTargetTypeAndTargetUidAndUser("TRIP", trip.getTripUid(), user);
 		Long tripLikesCount = likesRepository.countByTargetTypeAndTargetUid("TRIP", trip.getTripUid());
 		Long tripCommentCount = commentRepository.countByTargetTypeAndTargetUidAndDeletedFalse("TRIP", trip.getTripUid());
+		Long tripScriptCount = tripScriptRepository.countByCopiedTrip(trip);
 
 		TripDto tripDto = new TripDto();
 		tripDto.setTripUid(trip.getTripUid()); // Use UUID as the identifier instead of internal ID
@@ -64,7 +68,7 @@ public class TripMapper {
 		tripDto.setIsLiked(isLiked);
 		tripDto.setCommentsCount(tripCommentCount);
 		tripDto.setLikesCount(tripLikesCount);
-		tripDto.setScriptedCount(null);
+		tripDto.setScriptedCount(tripScriptCount);
 		return tripDto;
 	}
 

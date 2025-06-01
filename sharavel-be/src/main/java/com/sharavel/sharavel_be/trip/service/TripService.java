@@ -14,8 +14,6 @@ import com.sharavel.sharavel_be.trip.dto.response.TripResponse;
 public interface TripService {
 	public TripDto createTrip(TripRequest trip);
 
-	public void scriptTrip(String tripUid);
-
 	public TripResponse getTripByUuid(String tripUid);
 
 	public List<TripListDto> getUserAllTrips(String userUuid);

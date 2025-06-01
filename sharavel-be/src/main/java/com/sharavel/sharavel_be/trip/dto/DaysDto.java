@@ -3,17 +3,17 @@ package com.sharavel.sharavel_be.trip.dto;
 import java.util.List;
 
 public class DaysDto {
-	private Long id;
+	// private Long id;
 	private Integer number;
 	private List<LocationDto> locations;
 
-	public Long getId() {
-		return id;
-	}
+	// public Long getId() {
+	// return id;
+	// }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+	// public void setId(Long id) {
+	// this.id = id;
+	// }
 
 	public Integer getNumber() {
 		return number;

@@ -15,5 +15,7 @@ public interface DaysRepository extends JpaRepository<Days, Long> {
 	Optional<Days> findById(Long id);
 
 	// Trip 객체로 Day 목록 조회
-	List<Days> findByTripId(Trip trip);
+	List<Days> findByTrip(Trip trip);
+
+	Days findByTrip_UidAndNumber(String tripUid, Integer number);
 }

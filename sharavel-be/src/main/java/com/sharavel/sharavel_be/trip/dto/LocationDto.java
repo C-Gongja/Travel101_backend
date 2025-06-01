@@ -3,20 +3,20 @@ package com.sharavel.sharavel_be.trip.dto;
 import java.math.BigDecimal;
 
 public class LocationDto {
-	private Long id;
+	// private Long id;
 	private Integer number;
 	private String name;
 	private BigDecimal longitude;
 	private BigDecimal latitude;
 	private String description;
 
-	public Long getId() {
-		return id;
-	}
+	// public Long getId() {
+	// return id;
+	// }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+	// public void setId(Long id) {
+	// this.id = id;
+	// }
 
 	public Integer getNumber() {
 		return number;
