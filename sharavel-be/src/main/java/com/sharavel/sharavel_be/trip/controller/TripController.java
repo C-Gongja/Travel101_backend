@@ -1,6 +1,7 @@
 package com.sharavel.sharavel_be.trip.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sharavel.sharavel_be.trip.dto.TripDto;
@@ -51,11 +53,11 @@ public class TripController {
 		return ResponseEntity.ok(tripResponse);
 	}
 
-	// @PostMapping("/scriptTrip/{tripUid}")
-	// public ResponseEntity<?> scriptTrip(@PathVariable String tripUid) {
-	// tripService.scriptTrip(tripUid);
-	// return ResponseEntity.ok("Successfully scripted!");
-	// }
+	@GetMapping("/getCloneTripList")
+	public ResponseEntity<?> getCloneTripsList(@RequestParam String userUid) {
+		List<TripDto> userTripsDto = tripService.getCloneTripsList(userUid);
+		return ResponseEntity.ok(userTripsDto);
+	}
 
 	@PutMapping("/{tripUid}")
 	public ResponseEntity<TripDto> putTripField(

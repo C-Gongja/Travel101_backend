@@ -72,6 +72,40 @@ public class TripMapper {
 		return tripDto;
 	}
 
+	public TripDto toCloneTripDto(Trip trip) {
+
+		TripDto tripDto = new TripDto();
+		tripDto.setTripUid(trip.getTripUid()); // Use UUID as the identifier instead of internal ID
+		tripDto.setName(trip.getName());
+		tripDto.setStartDate(trip.getStartDate());
+		tripDto.setEndDate(trip.getEndDate());
+		tripDto.setCompleted(trip.isCompleted());
+		tripDto.setCountries(
+				trip.getCountries().stream()
+						.map(CountryDto::new) // Convert Country to CountryDto using the constructor
+						.collect(Collectors.toList()));
+
+		List<DaysDto> dayDtos = trip.getDays().stream().map(day -> {
+			DaysDto dayDto = new DaysDto();
+			dayDto.setNumber(day.getNumber());
+			dayDto.setLocations(day.getLocations().stream().map(loc -> {
+				LocationDto locDto = new LocationDto();
+				locDto.setNumber(loc.getNumber());
+				locDto.setName(loc.getName());
+				locDto.setDescription(loc.getDescription());
+				return locDto;
+			})
+					.sorted(Comparator.comparingInt(LocationDto::getNumber))
+					.collect(Collectors.toList()));
+			return dayDto;
+		})
+				.sorted(Comparator.comparingInt(DaysDto::getNumber))
+				.collect(Collectors.toList());
+
+		tripDto.setDays(dayDtos);
+		return tripDto;
+	}
+
 	public TripListDto toListDto(Trip trip) {
 		Long tripCommentCount = commentRepository.countByTargetTypeAndTargetUidAndDeletedFalse("TRIP", trip.getTripUid());
 		Long tripLikesCount = likesRepository.countByTargetTypeAndTargetUid("TRIP", trip.getTripUid());

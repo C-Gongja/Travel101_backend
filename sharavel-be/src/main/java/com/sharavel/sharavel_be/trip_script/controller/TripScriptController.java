@@ -25,14 +25,14 @@ public class TripScriptController {
 	@PostMapping("/scriptDay")
 	public ResponseEntity<?> scriptdDay(@RequestParam String tripUid, @RequestParam Integer dayNum,
 			@RequestParam String targetTripUid) {
-		tripScriptService.scriptTrip(tripUid);
+		tripScriptService.scriptDay(tripUid, dayNum, targetTripUid);
 		return ResponseEntity.ok("Successfully scripted!");
 	}
 
 	@PostMapping("/scriptLocation")
 	public ResponseEntity<?> scriptLocation(@RequestParam String tripUid, @RequestParam Integer dayNum,
-			@RequestParam Integer locNum) {
-		tripScriptService.scriptTrip(tripUid);
+			@RequestParam Integer locNum, @RequestParam String targetTripUid, @RequestParam String targetDayNum) {
+		tripScriptService.scriptLocation(tripUid, dayNum, locNum, targetTripUid, targetDayNum);
 		return ResponseEntity.ok("Successfully scripted!");
 	}
 

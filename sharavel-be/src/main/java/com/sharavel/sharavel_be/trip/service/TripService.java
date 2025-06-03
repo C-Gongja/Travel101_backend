@@ -18,6 +18,8 @@ public interface TripService {
 
 	public List<TripListDto> getUserAllTrips(String userUuid);
 
+	public List<TripDto> getCloneTripsList(String userUid);
+
 	public List<TripListDto> getAllTrips();
 
 	public TripDto putUpdatedTrip(String tripUid, TripRequest updatedTrip);

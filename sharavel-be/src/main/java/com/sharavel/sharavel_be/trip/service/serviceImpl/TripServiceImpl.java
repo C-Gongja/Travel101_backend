@@ -259,4 +259,18 @@ public class TripServiceImpl implements TripService {
 		tripRepository.delete(trip);
 		return ResponseEntity.ok("Deleted Trip");
 	}
+
+	@Override
+	public List<TripDto> getCloneTripsList(String userUid) {
+		Users user = userRepository.findByUuid(userUid)
+				.orElseThrow(() -> new IllegalStateException("getUserAllTrips User not found"));
+		Long uid = user.getId();
+		List<Trip> userTrips = tripRepository.findByUid_Id(uid);
+
+		List<TripDto> userTripsDto = userTrips.stream()
+				.map(trip -> (TripDto) tripMapper.toCloneTripDto(trip))
+				.collect(Collectors.toList());
+
+		return userTripsDto;
+	}
 }
