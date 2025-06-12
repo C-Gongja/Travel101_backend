@@ -28,7 +28,6 @@ import com.sharavel.sharavel_be.security.jwt.JwtAuthFilter;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
 	private final JwtAuthEntryPoint jwtAuthEntryPoint;
 	private final JwtAuthFilter jwtAuthFilter;
 	private final UserDetailsService userDetailsService;
