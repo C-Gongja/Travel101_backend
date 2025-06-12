@@ -21,20 +21,23 @@ public class Locations {
 	@JoinColumn(name = "day_id", nullable = false)
 	private Days day;
 
-	@Column(nullable = true)
+	@Column(nullable = false)
 	private Integer number;
 
-	@Column(nullable = true)
+	@Column(nullable = false)
 	private String name;
 
-	@Column(nullable = true, precision = 10, scale = 7)
+	@Column(nullable = false, precision = 10, scale = 7)
 	private BigDecimal longitude;
 
-	@Column(nullable = true, precision = 10, scale = 7)
+	@Column(nullable = false, precision = 10, scale = 7)
 	private BigDecimal latitude;
 
 	@Column(nullable = true)
 	private String description;
+
+	@Column(nullable = false)
+	private String countryIso2;
 
 	public Long getId() {
 		return id;
@@ -90,6 +93,14 @@ public class Locations {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public String getCountryIso2() {
+		return countryIso2;
+	}
+
+	public void setCountryIso2(String countryIso2) {
+		this.countryIso2 = countryIso2;
 	}
 
 }

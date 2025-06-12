@@ -5,5 +5,5 @@ import java.util.List;
 import com.sharavel.sharavel_be.trip.dto.TripListDto;
 
 public interface SearchRepositoryCustom {
-	List<TripListDto> searchAll(String keyword);
+	// List<TripListDto> searchAll(String keyword);
 }

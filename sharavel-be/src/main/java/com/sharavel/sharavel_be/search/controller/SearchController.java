@@ -13,15 +13,15 @@ import com.sharavel.sharavel_be.trip.dto.TripListDto;
 @RestController
 @RequestMapping("/public")
 public class SearchController {
-	private final SearchRepositoryCustom searchRepository;
+	// private final SearchRepositoryCustom searchRepository;
 
-	public SearchController(SearchRepositoryCustom searchRepository) {
-		this.searchRepository = searchRepository;
-	}
+	// public SearchController(SearchRepositoryCustom searchRepository) {
+	// 	this.searchRepository = searchRepository;
+	// }
 
-	@GetMapping("/search")
-	public List<TripListDto> search(@RequestParam String keyword) {
+	// @GetMapping("/search")
+	// public List<TripListDto> search(@RequestParam String keyword) {
 		
-		return searchRepository.searchAll(keyword);
-	}
+	// 	return searchRepository.searchAll(keyword);
+	// }
 }

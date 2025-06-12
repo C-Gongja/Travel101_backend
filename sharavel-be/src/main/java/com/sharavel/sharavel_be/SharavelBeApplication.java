@@ -9,5 +9,4 @@ public class SharavelBeApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SharavelBeApplication.class, args);
 	}
-
 }

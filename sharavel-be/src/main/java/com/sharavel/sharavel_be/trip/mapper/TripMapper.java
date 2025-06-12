@@ -55,6 +55,7 @@ public class TripMapper {
 				locDto.setLongitude(loc.getLongitude());
 				locDto.setLatitude(loc.getLatitude());
 				locDto.setDescription(loc.getDescription());
+				locDto.setCountryIso2(loc.getCountryIso2());
 				return locDto;
 			})
 					.sorted(Comparator.comparingInt(LocationDto::getNumber))

@@ -1,0 +1,111 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.4.3'
+    id 'io.spring.dependency-management' version '1.1.6'
+    // id 'com.ewerk.gradle.plugins.querydsl' // QueryDSL 플러그인 제거
+}
+
+group = 'com.sharavel'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '21'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+    // querydslAnnotationProcessor { // QueryDSL 어노테이션 프로세서 configuration 제거
+    //     extendsFrom annotationProcessor
+    // }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Spring Boot Starters
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // PostgreSQL
+    runtimeOnly 'org.postgresql:postgresql'
+
+    // QueryDSL JPA // QueryDSL 의존성 주석 처리 (또는 제거)
+    // implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    // annotationProcessor 'com.querydsl:querydsl-apt:5.0.0:jakarta' // 이 부분은 위에서 제거한 querydslAnnotationProcessor를 사용했다면 불필요
+    // querydslAnnotationProcessor 'com.querydsl:querydsl-apt:5.0.0:jakarta' // 이 부분도 제거
+
+    // JWT
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+    // Json Patch
+    implementation 'com.github.fge:json-patch:1.9'
+
+    // Development Only
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    // Test Dependencies
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+}
+
+// QueryDSL 설정을 위한 블록 전체 제거 (또는 주석 처리)
+// querydsl {
+//     jpa = true
+//     querydslSourcesDir = "$buildDir/generated/querydsl"
+// }
+
+// QueryDSL Q-Class 생성을 위한 수동 설정 (전체 제거 또는 주석 처리)
+// def generatedQuerydslDir = layout.buildDirectory.dir('generated/querydsl').get().asFile
+//
+// tasks.withType(JavaCompile).configureEach {
+//     options.compilerArgs << "-parameters"
+// }
+//
+// task generateQuerydsl(type: JavaCompile) {
+//     source = sourceSets.main.java
+//     classpath = configurations.compileClasspath + configurations.querydslAnnotationProcessor
+//     destinationDirectory = generatedQuerydslDir
+//     options.annotationProcessorPath = configurations.querydslAnnotationProcessor
+//     options.compilerArgs = [
+//             "-Aquerydsl.jpa.entityAnnotation=jakarta.persistence.Entity",
+//             "-s", generatedQuerydslDir.absolutePath
+//     ]
+// }
+//
+// compileJava {
+//     dependsOn generateQuerydsl
+//     source << generatedQuerydslDir
+// }
+//
+// sourceSets {
+//     main {
+//         java {
+//             srcDirs += [generatedQuerydslDir]
+//         }
+//     }
+// }
+//
+// clean {
+//     delete generatedQuerydslDir
+// }
+
+
+// 아래는 QueryDSL과 무관하므로 유지합니다.
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+// 컴파일러 인자도 QueryDSL과 직접 관련 없지만, 일반적으로 필요한 경우가 많으므로 유지합니다.
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs << "-parameters"
+}

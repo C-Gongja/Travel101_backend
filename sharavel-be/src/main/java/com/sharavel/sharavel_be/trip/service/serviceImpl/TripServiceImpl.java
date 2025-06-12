@@ -213,6 +213,7 @@ public class TripServiceImpl implements TripService {
 				location.setLongitude(locDto.getLongitude());
 				location.setLatitude(locDto.getLatitude());
 				location.setDescription(locDto.getDescription());
+				location.setCountryIso2(locDto.getCountryIso2());
 				updatedLocations.add(location);
 				existingLocationsMap.remove(locDto.getNumber());
 			}

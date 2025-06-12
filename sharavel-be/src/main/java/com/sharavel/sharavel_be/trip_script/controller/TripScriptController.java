@@ -4,10 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sharavel.sharavel_be.trip_script.dto.request.ScriptDayRequestDto;
+import com.sharavel.sharavel_be.trip_script.dto.request.ScriptLocationRequestDto;
 import com.sharavel.sharavel_be.trip_script.service.TripScriptService;
 
 @RestController
@@ -23,16 +26,14 @@ public class TripScriptController {
 	}
 
 	@PostMapping("/scriptDay")
-	public ResponseEntity<?> scriptdDay(@RequestParam String tripUid, @RequestParam Integer dayNum,
-			@RequestParam String targetTripUid) {
-		tripScriptService.scriptDay(tripUid, dayNum, targetTripUid);
+	public ResponseEntity<?> scriptdDay(@RequestBody ScriptDayRequestDto request) {
+		tripScriptService.scriptDay(request);
 		return ResponseEntity.ok("Successfully scripted!");
 	}
 
 	@PostMapping("/scriptLocation")
-	public ResponseEntity<?> scriptLocation(@RequestParam String tripUid, @RequestParam Integer dayNum,
-			@RequestParam Integer locNum, @RequestParam String targetTripUid, @RequestParam String targetDayNum) {
-		tripScriptService.scriptLocation(tripUid, dayNum, locNum, targetTripUid, targetDayNum);
+	public ResponseEntity<?> scriptLocation(@RequestBody ScriptLocationRequestDto request) {
+		tripScriptService.scriptLocation(request);
 		return ResponseEntity.ok("Successfully scripted!");
 	}
 

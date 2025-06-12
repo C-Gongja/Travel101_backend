@@ -1,12 +1,14 @@
 package com.sharavel.sharavel_be.trip_script.service;
 
+import com.sharavel.sharavel_be.trip_script.dto.request.ScriptDayRequestDto;
+import com.sharavel.sharavel_be.trip_script.dto.request.ScriptLocationRequestDto;
+
 public interface TripScriptService {
 	public void scriptTrip(String tripUid);
 
-	public void scriptDay(String tripUid, Integer dayNum, String targetTripUid);
+	public void scriptDay(ScriptDayRequestDto request);
 
-	public void scriptLocation(String tripUid, Integer dayNum, Integer locNum, String targetTripUid,
-			Integer targetDayNum);
+	public void scriptLocation(ScriptLocationRequestDto request);
 
 	public Long getScriptedCount(String tripUid);
 }

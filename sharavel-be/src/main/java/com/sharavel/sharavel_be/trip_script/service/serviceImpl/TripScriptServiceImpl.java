@@ -21,6 +21,8 @@ import com.sharavel.sharavel_be.trip.entity.Trip;
 import com.sharavel.sharavel_be.trip.repository.DaysRepository;
 import com.sharavel.sharavel_be.trip.repository.LocationsRepository;
 import com.sharavel.sharavel_be.trip.repository.TripRepository;
+import com.sharavel.sharavel_be.trip_script.dto.request.ScriptDayRequestDto;
+import com.sharavel.sharavel_be.trip_script.dto.request.ScriptLocationRequestDto;
 import com.sharavel.sharavel_be.trip_script.entity.TripScript;
 import com.sharavel.sharavel_be.trip_script.repository.TripScriptRepository;
 import com.sharavel.sharavel_be.trip_script.service.TripScriptService;
@@ -101,6 +103,7 @@ public class TripScriptServiceImpl implements TripScriptService {
 				newLoc.setLongitude(originalLoc.getLongitude());
 				newLoc.setLatitude(originalLoc.getLatitude());
 				newLoc.setDescription(originalLoc.getDescription());
+				newLoc.setCountryIso2(originalLoc.getCountryIso2());
 				return newLoc;
 			}).collect(Collectors.toList());
 
@@ -130,19 +133,18 @@ public class TripScriptServiceImpl implements TripScriptService {
 	}
 
 	@Override
-	public void scriptDay(String tripUid, Integer dayNum, String targetTripUid) {
+	public void scriptDay(ScriptDayRequestDto request) {
 		Users user = getCurrentUser();
 
-		Days originalDay = daysRepository.findByTrip_TripUidAndNumber(tripUid, dayNum);
-		Trip targetTrip = tripRepository.findByTripUid(targetTripUid)
+		Days originalDay = daysRepository.findByTrip_TripUidAndNumber(request.getTripUid(), request.getDayNum());
+		Trip targetTrip = tripRepository.findByTripUid(request.getTargetTripUid())
 				.orElseThrow(() -> new RuntimeException("Trip not found"));
 
 		List<Days> targetDays = targetTrip.getDays();
 
-		int nextDayNumber = 1; // 기본값: 아무 day도 없을 경우
+		int nextDayNumber = 1;
 
 		if (!targetDays.isEmpty()) {
-			// day 번호들 중 가장 큰 값을 찾음
 			nextDayNumber = targetDays.stream()
 					.mapToInt(Days::getNumber)
 					.max()
@@ -163,10 +165,13 @@ public class TripScriptServiceImpl implements TripScriptService {
 			newLoc.setLongitude(loc.getLongitude());
 			newLoc.setLatitude(loc.getLatitude());
 			newLoc.setDescription(loc.getDescription());
+			newLoc.setCountryIso2(loc.getCountryIso2());
 			return newLoc;
 		}).collect(Collectors.toList());
 
 		copiedDay.setLocations(copiedLocations);
+		// 기존 days에 추가
+		targetTrip.getDays().add(copiedDay);
 
 		// TripScript 생성
 		TripScript script = new TripScript();
@@ -174,43 +179,54 @@ public class TripScriptServiceImpl implements TripScriptService {
 		script.setScriptUser(user);
 		script.setDay(originalDay);
 		script.setScriptedAt(LocalDateTime.now());
+		tripScriptRepository.save(script);
 
-		// 기존 days에 추가
-		targetTrip.getDays().add(copiedDay);
+		// endDate를 하루 늘림
+		targetTrip.setEndDate(targetTrip.getEndDate().plusDays(1));
+
 		tripRepository.save(targetTrip);
+		daysRepository.save(copiedDay);
+		locationRepository.saveAll(copiedLocations);
 	}
 
 	@Override
-	public void scriptLocation(String tripUid, Integer dayNum, Integer locNum, String targetTripUid,
-			Integer targetDayNum) {
+	public void scriptLocation(ScriptLocationRequestDto request) {
+		System.out.println(request.toString());
 		Users user = getCurrentUser();
 
-		Days originalDay = daysRepository.findByTrip_TripUidAndNumber(tripUid, dayNum);
-		Locations ogLoc = locationRepository.findByDay(originalDay);
-
-		Trip targetTrip = tripRepository.findByTripUid(targetTripUid)
-				.orElseThrow(() -> new RuntimeException("Trip not found"));
-		Days targetDay = daysRepository.findByTrip_TripUidAndNumber(targetTrip.getTripUid(), targetDayNum);
-
-		List<Locations> targetLoc = targetDay.getLocations();
-
-		int nextDLocNumber = 1; // 기본값: 아무 day도 없을 경우
-
-		if (!targetLoc.isEmpty()) {
-			// day 번호들 중 가장 큰 값을 찾음
-			nextDLocNumber = targetLoc.stream()
-					.mapToInt(Locations::getNumber)
-					.max()
-					.orElse(0) + 1;
+		Days originalDay = daysRepository.findByTrip_TripUidAndNumber(request.getTripUid(), request.getDayNum());
+		if (originalDay == null) {
+			throw new RuntimeException("Original Day not found");
 		}
+
+		Locations ogLoc = locationRepository.findByDayAndNumber(originalDay, request.getLocNum())
+				.orElseThrow(() -> new RuntimeException("Original Location not found"));
+
+		Trip targetTrip = tripRepository.findByTripUid(request.getTargetTripUid())
+				.orElseThrow(() -> new RuntimeException("Trip not found"));
+
+		Days targetDay = daysRepository.findByTrip_TripUidAndNumber(request.getTargetTripUid(), request.getTargetDayNum());
+		if (targetDay == null) {
+			throw new RuntimeException("Target Day not found");
+		}
+
+		// 3. 붙여넣을 위치 번호 계산
+		int nextLocNumber = targetDay.getLocations().stream()
+				.mapToInt(Locations::getNumber)
+				.max()
+				.orElse(0) + 1;
 
 		Locations newLoc = new Locations();
 		newLoc.setDay(targetDay);
-		newLoc.setNumber(nextDLocNumber);
+		newLoc.setNumber(nextLocNumber);
 		newLoc.setName(ogLoc.getName());
 		newLoc.setLongitude(ogLoc.getLongitude());
 		newLoc.setLatitude(ogLoc.getLatitude());
 		newLoc.setDescription(ogLoc.getDescription());
+		newLoc.setCountryIso2(ogLoc.getCountryIso2());
+
+		locationRepository.save(newLoc);
+		targetDay.getLocations().add(newLoc);
 
 		// TripScript 생성
 		TripScript script = new TripScript();
@@ -218,5 +234,7 @@ public class TripScriptServiceImpl implements TripScriptService {
 		script.setScriptUser(user);
 		script.setLocation(newLoc);
 		script.setScriptedAt(LocalDateTime.now());
+
+		tripRepository.save(targetTrip);
 	}
 }
