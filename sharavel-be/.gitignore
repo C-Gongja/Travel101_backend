@@ -1,6 +1,8 @@
 HELP.md
 target/
-!.mvn/wrapper/maven-wrapper.jar
+.gradle/
+build/
+*.gradle.kts
 !**/src/main/**/target/
 !**/src/test/**/target/
 src/main/resources/
