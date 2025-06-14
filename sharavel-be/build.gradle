@@ -54,7 +54,8 @@ dependencies {
     implementation 'com.github.fge:json-patch:1.9'
 
 		// AWS
-		implementation 'com.amazonaws:aws-java-sdk-s3:1.12.649'
+		// S3 v2
+		implementation 'software.amazon.awssdk:s3:2.31.62'
 
     // Development Only
     developmentOnly 'org.springframework.boot:spring-boot-devtools'

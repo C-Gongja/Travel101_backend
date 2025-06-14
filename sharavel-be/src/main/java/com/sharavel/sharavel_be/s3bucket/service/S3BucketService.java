@@ -1,26 +1,15 @@
 package com.sharavel.sharavel_be.s3bucket.service;
 
-import java.io.IOException;
-import java.util.List;
+import java.net.URL;
 
-import com.amazonaws.AmazonClientException;
-import com.amazonaws.services.s3.model.Bucket;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface S3BucketService {
-	// get list of buckets for given user
-	List<Bucket> getBucketList();
+	String uploadFile(MultipartFile file, Long tripId);
 
-	// check if given bucket name valid
-	boolean validateBucket(String bucketName);
+	URL generatePresignedUrl(String s3Key, long expirationSeconds);
 
-	// download given objectName from the bucket
-	void getObjectFromBucket(String bucketName, String objectName) throws IOException;
+	byte[] getObjectBytes(String s3Key);
 
-	// upload given file as objectName to S3 bucket
-	void putObjectIntoBucket(String bucketName, String objectName, String filePathToUpload);
-
-	// create Bucket with provided name (throws exception if bucket already present)
-	void createBucket(String bucket);
-
-	List<String> listFiles(final String bucketName) throws AmazonClientException;
+	void deleteFile(String s3Key);
 }

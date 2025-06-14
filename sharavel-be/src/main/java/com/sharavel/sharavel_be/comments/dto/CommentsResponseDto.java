@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 public class CommentsResponseDto {
 	private String uid;
 	private String content;
+	private String picture;
 	private String username; // or userId, or both
 	private String userUid;
 	private String parentUid;
@@ -13,10 +14,11 @@ public class CommentsResponseDto {
 	private Long likesCount;
 	private Long childCount;
 
-	public CommentsResponseDto(String uid, String content, String username, String userUid,
+	public CommentsResponseDto(String uid, String content, String picture, String username, String userUid,
 			String parentUid, LocalDateTime createdAt, boolean isLiked, Long likesCount, Long childCount) {
 		this.uid = uid;
 		this.content = content;
+		this.picture = picture;
 		this.username = username;
 		this.userUid = userUid;
 		this.parentUid = parentUid;
@@ -98,4 +100,11 @@ public class CommentsResponseDto {
 		this.childCount = childCount;
 	}
 
+	public String getPicture() {
+		return picture;
+	}
+
+	public void setPicture(String picture) {
+		this.picture = picture;
+	}
 }

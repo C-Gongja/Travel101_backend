@@ -5,16 +5,18 @@ import java.time.LocalDateTime;
 public class SingleCommentDto {
 	private String uid;
 	private String content;
+	private String picture;
 	private String username;
 	private String targetUid;
 	private String parentUid;
 	private LocalDateTime createdAt;
 
-	public SingleCommentDto(String uid, String content, String userName, String targetUid,
+	public SingleCommentDto(String uid, String content, String picture, String userName, String targetUid,
 			LocalDateTime createdAt,
 			String parentUid) {
 		this.uid = uid;
 		this.content = content;
+		this.picture = picture;
 		this.username = userName;
 		this.targetUid = targetUid;
 		this.createdAt = createdAt;
@@ -69,10 +71,17 @@ public class SingleCommentDto {
 		this.parentUid = parentUid;
 	}
 
+	public String getPicture() {
+		return picture;
+	}
+
+	public void setPicture(String picture) {
+		this.picture = picture;
+	}
+
 	@Override
 	public String toString() {
 		return "SingleCommentDto [uid=" + uid + ", content=" + content + ", userName=" + username + ", targetUid="
 				+ targetUid + ", parentUid=" + parentUid + ", createdAt=" + createdAt + "]";
 	}
-
 }

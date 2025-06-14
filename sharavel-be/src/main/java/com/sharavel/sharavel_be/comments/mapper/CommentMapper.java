@@ -33,6 +33,7 @@ public class CommentMapper {
 		return new CommentsResponseDto(
 				comment.getUid(),
 				comment.getContent(),
+				comment.getUser().getPicture(),
 				comment.getUser().getUsername(),
 				comment.getUser().getUuid(),
 				comment.getParent() != null ? comment.getParent().getUid() : null,
@@ -54,6 +55,7 @@ public class CommentMapper {
 		return new CommentsResponseDto(
 				comment.getUid(),
 				comment.getContent(),
+				comment.getUser().getPicture(),
 				comment.getUser().getUsername(),
 				comment.getUser().getUuid(),
 				comment.getParent() != null ? comment.getParent().getUid() : null,
@@ -67,6 +69,7 @@ public class CommentMapper {
 		return new SingleCommentDto(
 				comment.getUid(),
 				comment.getContent(),
+				comment.getUser().getPicture(),
 				comment.getUser().getUsername(),
 				comment.getTargetUid(),
 				comment.getCreatedAt(),
