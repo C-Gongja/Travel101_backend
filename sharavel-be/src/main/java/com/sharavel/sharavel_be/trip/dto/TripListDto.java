@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.sharavel.sharavel_be.countries.dto.CountryDto;
+import com.sharavel.sharavel_be.s3bucket.dto.response.S3TripMediaResponse;
 
 public class TripListDto {
 	private String tripUid;
@@ -16,12 +17,13 @@ public class TripListDto {
 	private Long likesCount;
 	private Long commentsCount;
 	private Long scriptedCount;
+	private List<S3TripMediaResponse> media;
 
 	public TripListDto() {
 	}
 
 	public TripListDto(String tripUid, String name, String username, LocalDate startDate, LocalDate endDate,
-			List<CountryDto> countries, boolean isCompleted, Long scriptedCount) {
+			List<CountryDto> countries, boolean isCompleted, Long scriptedCount, List<S3TripMediaResponse> media) {
 		this.tripUid = tripUid;
 		this.username = username;
 		this.name = name;
@@ -30,6 +32,7 @@ public class TripListDto {
 		this.countries = countries;
 		this.isCompleted = isCompleted;
 		this.scriptedCount = scriptedCount;
+		this.media = media;
 	}
 
 	// get trip uid
@@ -111,6 +114,14 @@ public class TripListDto {
 
 	public void setIsCompleted(boolean isCompleted) {
 		this.isCompleted = isCompleted;
+	}
+
+	public List<S3TripMediaResponse> getMedia() {
+		return media;
+	}
+
+	public void setMedia(List<S3TripMediaResponse> media) {
+		this.media = media;
 	}
 
 	@Override

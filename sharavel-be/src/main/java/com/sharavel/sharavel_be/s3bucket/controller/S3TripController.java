@@ -19,34 +19,35 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.sharavel.sharavel_be.s3bucket.dto.response.S3TripMediaResponse;
 import com.sharavel.sharavel_be.s3bucket.entity.S3TripMedia;
 import com.sharavel.sharavel_be.s3bucket.repository.S3TripMediaRepository;
 import com.sharavel.sharavel_be.s3bucket.service.S3BucketService;
 
 @RestController
-@RequestMapping("/public/s3")
+@RequestMapping("/api/s3")
 public class S3TripController {
 	@Autowired
 	private S3BucketService s3Service;
 	@Autowired
 	private S3TripMediaRepository tripMediaRepository; // DB 조회를 위해 주입
 
-	@PostMapping("/upload/{tripId}")
-	public ResponseEntity<List<String>> uploadFile(
+	@PostMapping("/upload/{tripUid}/{dayNum}/{locNum}")
+	public ResponseEntity<List<?>> uploadFile(
 			@RequestParam("file") List<MultipartFile> files,
-			@PathVariable Long tripId) {
+			@PathVariable String tripUid, @PathVariable Integer dayNum, @PathVariable Integer locNum) {
 		try {
 			if (files == null || files.isEmpty()) {
 				throw new IllegalArgumentException("업로드할 파일이 없습니다.");
 			}
 
-			List<String> uploadedS3Keys = new ArrayList<>();
+			List<S3TripMediaResponse> response = new ArrayList<>();
 			for (MultipartFile file : files) {
 				// 단일 파일 업로드 로직을 반복하여 호출
-				String s3Key = s3Service.uploadFile(file, tripId);
-				uploadedS3Keys.add(s3Key);
+				S3TripMediaResponse uploaded = s3Service.uploadFile(file, tripUid, dayNum, locNum);
+				response.add(uploaded);
 			}
-			return ResponseEntity.ok(uploadedS3Keys); // 업로드된 S3 키 리스트 반환
+			return ResponseEntity.ok(response);
 		} catch (IllegalArgumentException e) {
 			return ResponseEntity.badRequest().body(List.of("파일 업로드 실패: " + e.getMessage()));
 		} catch (RuntimeException e) {
@@ -65,10 +66,10 @@ public class S3TripController {
 		}
 	}
 
-	@GetMapping("/trip/{tripId}/media-urls")
-	public ResponseEntity<List<String>> getTripMediaUrls(@PathVariable Long tripId) {
+	@GetMapping("/trip/{tripUid}/media-urls")
+	public ResponseEntity<List<String>> getTripMediaUrls(@PathVariable String tripUid) {
 		// 1. DB에서 해당 tripId에 연결된 모든 TripMedia 객체 조회
-		List<S3TripMedia> mediaList = tripMediaRepository.findByTripId(tripId);
+		List<S3TripMedia> mediaList = tripMediaRepository.findByTripUid(tripUid);
 
 		// 2. 각 TripMedia 객체의 S3 Key를 사용하여 Presigned URL 생성
 		List<String> presignedUrls = mediaList.stream()

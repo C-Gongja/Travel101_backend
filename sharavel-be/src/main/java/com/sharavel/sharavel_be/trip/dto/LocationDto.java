@@ -1,6 +1,9 @@
 package com.sharavel.sharavel_be.trip.dto;
 
 import java.math.BigDecimal;
+import java.util.List;
+
+import com.sharavel.sharavel_be.s3bucket.dto.response.S3TripMediaResponse;
 
 public class LocationDto {
 	private Integer number;
@@ -9,6 +12,7 @@ public class LocationDto {
 	private BigDecimal latitude;
 	private String description;
 	private String countryIso2;
+	private List<S3TripMediaResponse> media;
 
 	public Integer getNumber() {
 		return number;
@@ -58,14 +62,18 @@ public class LocationDto {
 		this.countryIso2 = countryIso2;
 	}
 
+	public void setMedia(List<S3TripMediaResponse> media) {
+		this.media = media;
+	}
+
+	public List<S3TripMediaResponse> getMedia() {
+		return media;
+	}
+
 	@Override
 	public String toString() {
-		return "Locations{" +
-				"name='" + name + '\'' +
-				", number=" + number +
-				", address= (" + longitude + "," + latitude + ")" +
-				", description=" + description +
-				'}';
+		return "LocationDto [number=" + number + ", name=" + name + ", longitude=" + longitude + ", latitude=" + latitude
+				+ ", description=" + description + ", countryIso2=" + countryIso2 + ", media=" + media + "]";
 	}
 
 }

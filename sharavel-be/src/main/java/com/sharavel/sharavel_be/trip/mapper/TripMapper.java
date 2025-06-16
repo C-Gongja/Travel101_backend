@@ -1,5 +1,6 @@
 package com.sharavel.sharavel_be.trip.mapper;
 
+import java.net.URL;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -10,6 +11,10 @@ import org.springframework.stereotype.Component;
 import com.sharavel.sharavel_be.comments.repository.CommentRepository;
 import com.sharavel.sharavel_be.countries.dto.CountryDto;
 import com.sharavel.sharavel_be.likes.repository.LikesRepository;
+import com.sharavel.sharavel_be.s3bucket.dto.response.S3TripMediaResponse;
+import com.sharavel.sharavel_be.s3bucket.entity.S3TripMedia;
+import com.sharavel.sharavel_be.s3bucket.repository.S3TripMediaRepository;
+import com.sharavel.sharavel_be.s3bucket.service.S3BucketService;
 import com.sharavel.sharavel_be.trip.dto.DaysDto;
 import com.sharavel.sharavel_be.trip.dto.LocationDto;
 import com.sharavel.sharavel_be.trip.dto.TripDto;
@@ -26,12 +31,17 @@ public class TripMapper {
 	private LikesRepository likesRepository;
 	@Autowired
 	private TripScriptRepository tripScriptRepository;
+	@Autowired
+	private S3TripMediaRepository s3TripMediaRepository;
+	@Autowired
+	private S3BucketService s3BucketService;
 
 	public TripDto toDto(Trip trip, Users user) {
 		boolean isLiked = likesRepository.existsByTargetTypeAndTargetUidAndUser("TRIP", trip.getTripUid(), user);
 		Long tripLikesCount = likesRepository.countByTargetTypeAndTargetUid("TRIP", trip.getTripUid());
 		Long tripCommentCount = commentRepository.countByTargetTypeAndTargetUidAndDeletedFalse("TRIP", trip.getTripUid());
 		Long tripScriptCount = tripScriptRepository.countByTrip(trip);
+		List<S3TripMedia> allMediaForTrip = s3TripMediaRepository.findByTripUid(trip.getTripUid());
 
 		TripDto tripDto = new TripDto();
 		tripDto.setTripUid(trip.getTripUid()); // Use UUID as the identifier instead of internal ID
@@ -56,6 +66,23 @@ public class TripMapper {
 				locDto.setLatitude(loc.getLatitude());
 				locDto.setDescription(loc.getDescription());
 				locDto.setCountryIso2(loc.getCountryIso2());
+
+				List<S3TripMediaResponse> mediaResponses = allMediaForTrip.stream()
+						.filter(media -> media.getDayNum().equals(day.getNumber()) && // 해당 Day의 Number와 일치
+								media.getLocationNum().equals(loc.getNumber()) // 해당 Location의 Number와 일치
+				)
+						.map(media -> {
+							URL presignedOrPublicUrl = s3BucketService.generatePresignedUrl(media.getS3Key(), 604800);
+							return new S3TripMediaResponse(
+									media.getObjectOwner(), // UUID를 String으로 변환
+									media.getS3Key(),
+									presignedOrPublicUrl);
+						})
+						.collect(Collectors.toList());
+
+				locDto.setMedia(mediaResponses);
+				// --- LocationDto에 media 설정 로직 끝 ---
+
 				return locDto;
 			})
 					.sorted(Comparator.comparingInt(LocationDto::getNumber))
@@ -111,6 +138,17 @@ public class TripMapper {
 		Long tripCommentCount = commentRepository.countByTargetTypeAndTargetUidAndDeletedFalse("TRIP", trip.getTripUid());
 		Long tripLikesCount = likesRepository.countByTargetTypeAndTargetUid("TRIP", trip.getTripUid());
 		Long tripScriptCount = tripScriptRepository.countByTrip(trip);
+		List<S3TripMedia> allMediaForTrip = s3TripMediaRepository.findByTripUid(trip.getTripUid());
+		List<S3TripMediaResponse> mediaResponses = allMediaForTrip.stream()
+				.limit(5)
+				.map(media -> {
+					URL presignedOrPublicUrl = s3BucketService.generatePresignedUrl(media.getS3Key(), 604800);
+					return new S3TripMediaResponse(
+							media.getObjectOwner(), // UUID를 String으로 변환
+							media.getS3Key(),
+							presignedOrPublicUrl);
+				})
+				.collect(Collectors.toList());
 
 		TripListDto tripListDto = new TripListDto();
 		tripListDto.setTripUid(trip.getTripUid());
@@ -126,6 +164,7 @@ public class TripMapper {
 		tripListDto.setScriptedCount(tripScriptCount);
 		tripListDto.setLikesCount(tripLikesCount);
 		tripListDto.setCommentsCount(tripCommentCount);
+		tripListDto.setMedia(mediaResponses);
 		return tripListDto;
 	}
 }

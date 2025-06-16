@@ -4,8 +4,10 @@ import java.net.URL;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.sharavel.sharavel_be.s3bucket.dto.response.S3TripMediaResponse;
+
 public interface S3BucketService {
-	String uploadFile(MultipartFile file, Long tripId);
+	S3TripMediaResponse uploadFile(MultipartFile file, String tripUid, Integer dayNum, Integer locNum);
 
 	URL generatePresignedUrl(String s3Key, long expirationSeconds);
 

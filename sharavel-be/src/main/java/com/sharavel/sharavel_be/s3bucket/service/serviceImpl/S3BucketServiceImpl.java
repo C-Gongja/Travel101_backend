@@ -13,9 +13,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.sharavel.sharavel_be.s3bucket.dto.response.S3TripMediaResponse;
 import com.sharavel.sharavel_be.s3bucket.entity.S3TripMedia;
+import com.sharavel.sharavel_be.s3bucket.entity.S3TripMedia.MediaType;
 import com.sharavel.sharavel_be.s3bucket.repository.S3TripMediaRepository;
 import com.sharavel.sharavel_be.s3bucket.service.S3BucketService;
+import com.sharavel.sharavel_be.trip.entity.Trip;
+import com.sharavel.sharavel_be.trip.repository.TripRepository;
 import com.sharavel.sharavel_be.user.entity.Users;
 import com.sharavel.sharavel_be.user.repository.UserRepository;
 
@@ -42,6 +46,8 @@ public class S3BucketServiceImpl implements S3BucketService {
 	private S3TripMediaRepository tripMediaRepository; // DB 연동을 위한 Repository
 	@Autowired
 	private UserRepository userRepository;
+	@Autowired
+	private TripRepository tripRepository;
 
 	@Value("${aws.s3.bucket-name}")
 	private String bucketName;
@@ -58,8 +64,16 @@ public class S3BucketServiceImpl implements S3BucketService {
 
 	@Override
 	@Transactional // S3 업로드와 DB 저장이 하나의 트랜잭션으로 처리되도록 함 (실패 시 롤백)
-	public String uploadFile(MultipartFile file, Long tripId) {
-		// Users user = getCurrentUser();
+	public S3TripMediaResponse uploadFile(MultipartFile file, String tripUid, Integer dayNum, Integer locNum) {
+		Users user = getCurrentUser();
+		Trip trip = tripRepository.findByTripUid(tripUid)
+				.orElseThrow(() -> new RuntimeException("getTripByUuid Trip not found"));
+
+		if (!user.getUuid().equals(trip.getUid().getUuid())) {
+			throw new IllegalArgumentException("permission denied");
+		}
+
+		// current user랑 trip의 소유자랑 같은지 확인 필요
 
 		if (file.isEmpty()) {
 			throw new IllegalArgumentException("file is empty.");
@@ -71,9 +85,11 @@ public class S3BucketServiceImpl implements S3BucketService {
 			fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
 		}
 		// S3에 저장될 파일의 고유한 이름 생성 (UUID + 원본 확장자)
-		String s3Key = UUID.randomUUID().toString() + fileExtension;
+		String s3Key = String.format("trips/%s/days/%d/locations/%d/%s%s",
+				tripUid, dayNum, locNum, UUID.randomUUID().toString(), fileExtension);
+
 		String contentType = file.getContentType();
-		String mediaType = (contentType != null && contentType.startsWith("video")) ? "VIDEO" : "IMAGE"; // 파일 타입 분류
+		MediaType mediaType = (contentType != null && contentType.startsWith("video")) ? MediaType.VIDEO : MediaType.IMAGE;
 
 		try {
 			// 1. S3에 파일 업로드 (V2 SDK 방식)
@@ -89,17 +105,24 @@ public class S3BucketServiceImpl implements S3BucketService {
 
 			// 2. 파일 메타데이터를 데이터베이스에 저장
 			S3TripMedia tripMedia = new S3TripMedia();
-			tripMedia.setObjectOwner("tempuser123");
-			tripMedia.setTripId(tripId);
+			tripMedia.setObjectOwner(user.getUuid());
+			tripMedia.setTripUid(tripUid);
+			tripMedia.setDayNum(dayNum);
+			tripMedia.setLocationNum(locNum);
 			tripMedia.setS3Key(s3Key);
 			tripMedia.setOriginalFileName(originalFilename);
 			tripMedia.setMediaType(mediaType);
+			// tripMedia.setUsageType(MediaUsageType.LOCATION_MEDIA);
 			tripMedia.setFileSize(file.getSize());
 			tripMedia.setUploadedAt(LocalDateTime.now()); // 현재 시간 기록
 
 			tripMediaRepository.save(tripMedia); // DB에 저장
 
-			return s3Key; // S3 키 반환 (나중에 조회/삭제 시 사용)
+			URL presignedUrl = generatePresignedUrl(s3Key, 604800);
+
+			S3TripMediaResponse response = new S3TripMediaResponse(user.getUuid(), s3Key, presignedUrl);
+			// return s3key and presignedURL
+			return response; // S3 키 반환 (나중에 조회/삭제 시 사용)
 
 		} catch (IOException e) {
 			// MultipartFile에서 바이트를 가져오는 중 발생할 수 있는 IO 에러
