@@ -238,50 +238,81 @@ public class TripServiceImpl implements TripService {
 				existingLocationsMap.remove(locDto.getNumber());
 
 				// --- Media (S3 Key) 관리 로직 ---
-				// 해당 Location에 대한 기존 미디어들을 가져옵니다.
-				List<S3TripMedia> existingMedia = s3TripMediaRepository
+				// 현재 Location에 대한 모든 기존 미디어 엔티티를 가져옵니다.
+				// 이는 이후에 ID를 사용하기 위함입니다.
+				List<S3TripMedia> existingMediaEntities = s3TripMediaRepository
 						.findByTripUidAndDayNumAndLocationNum(tripUid, dayDto.getNumber(), locDto.getNumber());
 
-				// 해당 location에 대한 기존 미디어의 s3key를 가져온다.
-				Set<String> existingS3Keys = existingMedia.stream()
-						.map(S3TripMedia::getS3Key)
-						.collect(Collectors.toSet());
+				// 1. 기존 미디어의 S3 키 맵 (빠른 조회를 위해)
+				// Map<S3Key, S3TripMedia> 형태로 저장하여 ID를 쉽게 가져올 수 있도록 합니다.
+				Map<String, S3TripMedia> existingS3KeyToMediaMap = existingMediaEntities.stream()
+						.collect(Collectors.toMap(S3TripMedia::getS3Key, media -> media));
 
-				// client에서 받은 DTO 미디어의 s3key 가져오기
-				Set<String> newMediaS3Keys = locDto.getMedia().stream()
+				// 2. 클라이언트에서 받은 DTO 미디어의 S3 키 세트
+				Set<String> newMediaS3KeysFromClient = locDto.getMedia().stream()
 						.map(S3TripMediaResponse::getS3Key)
 						.collect(Collectors.toSet());
 
-				// 1. 새로 추가된 미디어 (client에서 받은 DTO에는 있지만 DB에는 없는 것)
-				for (String s3Key : newMediaS3Keys) {
-					if (!existingS3Keys.contains(s3Key)) {
-						// 이 s3Key는 클라이언트에서 이미 S3에 업로드하고 DB에 저장된 상태라고 가정합니다.
-						// (별도의 /api/media/upload 엔드포인트를 통해 이미 처리됨)
-						// 여기서는 해당 S3TripMedia 엔티티를 찾아서 Location과의 연관 관계를 맺어줍니다.
-						// findByS3Key로 찾아서 tripId, dayNumber, locationNumber 업데이트
-						S3TripMedia mediaEntry = s3TripMediaRepository.findByS3Key(s3Key)
-								.orElseThrow(() -> new RuntimeException("Media entry not found for S3 key: " + s3Key));
+				// --- 미디어 변경 사항 감지 및 처리 ---
 
-						// 이미 업로드 시점에 tripId, dayNumber, locationNumber가 정확히 설정되었다면
-						// 이 부분은 유효성 검사로 사용할 수 있습니다.
-						if (!mediaEntry.getTripUid().equals(tripUid) ||
-								!mediaEntry.getDayNum().equals(dayDto.getNumber()) ||
-								!mediaEntry.getLocationNum().equals(locDto.getNumber())) {
-							// 기존 매핑이 다르다면 업데이트
-							mediaEntry.setTripUid(tripUid);
-							mediaEntry.setDayNum(dayDto.getNumber());
-							mediaEntry.setLocationNum(locDto.getNumber());
-							s3TripMediaRepository.save(mediaEntry);
-						}
-						mediaIdsToKeep.add(mediaEntry.getId());
-					} else {
-						// 이미 존재하는 미디어는 유지될 목록에 추가
-						existingMedia.stream()
-								.filter(m -> m.getS3Key().equals(s3Key))
-								.findFirst()
-								.ifPresent(m -> mediaIdsToKeep.add(m.getId()));
+				// DB에서 삭제해야 할 미디어 (existingS3Keys에는 있지만 newMediaS3Keys에는 없는 것)
+				// existingS3KeyToMediaMap의 keySet()을 사용하는 것이 좋습니다.
+				Set<String> s3KeysToDelete = new HashSet<>(existingS3KeyToMediaMap.keySet());
+				s3KeysToDelete.removeAll(newMediaS3KeysFromClient); // 클라이언트에 없는 키는 삭제 대상
+
+				// DB에 새로 추가하거나 업데이트해야 할 미디어 (newMediaS3Keys에는 있지만 existingS3Keys에는 없는 것)
+				Set<String> s3KeysToAddNewOrUpdate = new HashSet<>(newMediaS3KeysFromClient);
+				s3KeysToAddNewOrUpdate.removeAll(existingS3KeyToMediaMap.keySet()); // 기존에 없는 키는 추가/업데이트 대상
+
+				// 1. 삭제 대상 미디어 처리
+				if (!s3KeysToDelete.isEmpty()) {
+					List<S3TripMedia> mediaToDelete = s3KeysToDelete.stream()
+							.map(existingS3KeyToMediaMap::get)
+							.collect(Collectors.toList());
+					// 예를 들어, soft delete를 하거나 관계를 끊는 로직
+					s3TripMediaRepository.deleteAll(mediaToDelete); // 실제 삭제 시 사용
+					// 또는 mediaToDelete.forEach(media -> media.setDeleted(true));
+					// s3TripMediaRepository.saveAll(mediaToDelete);
+					// 또는 mediaToDelete.forEach(media -> media.setLocationNum(null)); // 관계만 끊는 경우
+				}
+
+				// 2. 새로 추가되거나 업데이트될 미디어 처리
+				for (String s3Key : s3KeysToAddNewOrUpdate) {
+					// 이 s3Key는 클라이언트에서 이미 S3에 업로드하고 DB에 저장된 상태라고 가정
+					// (별도의 /api/media/upload 엔드포인트를 통해 이미 처리됨)
+					// 여기서는 해당 S3TripMedia 엔티티를 찾아서 Location과의 연관 관계를 맺어줍니다.
+					S3TripMedia mediaEntry = s3TripMediaRepository.findByS3Key(s3Key)
+							.orElseThrow(() -> new RuntimeException("Media entry not found for S3 key: " + s3Key));
+
+					// mediaEntry가 이미 올바른 tripUid, dayNum, locNum을 가지고 있는지 확인 (옵션)
+					// 만약 S3 업로드 시점에 이 정보들이 이미 설정된다면 이 부분은 필요 없을 수 있습니다.
+					// 현재 로직상 미디어가 다른 Location에 속했다가 이 Location으로 옮겨지는 경우를 처리합니다.
+					if (!mediaEntry.getTripUid().equals(tripUid) ||
+							!mediaEntry.getDayNum().equals(dayDto.getNumber()) ||
+							!mediaEntry.getLocationNum().equals(locDto.getNumber())) {
+						mediaEntry.setTripUid(tripUid);
+						mediaEntry.setDayNum(dayDto.getNumber());
+						mediaEntry.setLocationNum(locDto.getNumber());
+						s3TripMediaRepository.save(mediaEntry); // 변경 사항 저장
+					}
+					mediaIdsToKeep.add(mediaEntry.getId()); // 유지될 미디어 목록에 추가
+				}
+
+				// 3. 기존에 존재하며 유지될 미디어 식별
+				// 클라이언트에서 보낸 S3 키 중 기존 DB에도 있는 키들을 찾습니다.
+				Set<String> s3KeysToKeep = new HashSet<>(newMediaS3KeysFromClient);
+				s3KeysToKeep.retainAll(existingS3KeyToMediaMap.keySet()); // 교집합 연산
+
+				for (String s3Key : s3KeysToKeep) {
+					S3TripMedia mediaEntry = existingS3KeyToMediaMap.get(s3Key);
+					if (mediaEntry != null) {
+						mediaIdsToKeep.add(mediaEntry.getId()); // 유지될 미디어 목록에 추가
 					}
 				}
+
+				// 이후 mediaIdsToKeep을 활용하여 Location과 S3TripMedia 간의 관계를 업데이트하거나
+				// 다른 필요한 로직을 수행할 수 있습니다.
+				// 예를 들어, 특정 Location의 모든 S3TripMedia를 이 mediaIdsToKeep 목록으로 동기화할 수 있습니다.
 			}
 
 			// 삭제된 Location 제거
@@ -299,16 +330,17 @@ public class TripServiceImpl implements TripService {
 
 		// --- S3TripMedia 테이블에서 더 이상 참조되지 않는 미디어 삭제 ---
 		// 해당 Trip에 속하면서도 이번 업데이트에서 유지 목록에 없는 미디어들을 찾습니다.
-		List<S3TripMedia> allTripMedia = s3TripMediaRepository.findByTripUid(tripUid);
-		List<S3TripMedia> mediaToDelete = allTripMedia.stream()
-				.filter(media -> !mediaIdsToKeep.contains(media.getId()))
-				.collect(Collectors.toList());
+		// List<S3TripMedia> allTripMedia =
+		// s3TripMediaRepository.findByTripUid(tripUid);
+		// List<S3TripMedia> mediaToDelete = allTripMedia.stream()
+		// .filter(media -> !mediaIdsToKeep.contains(media.getId()))
+		// .collect(Collectors.toList());
 
-		logger.debug("mediaToDelete: " + mediaToDelete);
-		for (S3TripMedia media : mediaToDelete) {
-			// S3에서 실제 파일 삭제 (S3UploadService에 deleteFileByS3Key 메서드 추가)
-			s3BucketService.deleteFile(media.getS3Key());
-		}
+		// logger.debug("mediaToDelete: " + mediaToDelete);
+		// for (S3TripMedia media : mediaToDelete) {
+		// // S3에서 실제 파일 삭제 (S3UploadService에 deleteFileByS3Key 메서드 추가)
+		// s3BucketService.deleteFile(media.getS3Key());
+		// }
 		// -------------------------------------------------------------
 		if (trip.isCompleted()) {
 			userRepository.save(user);

@@ -9,9 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -119,6 +121,8 @@ public class AuthServiceImpl implements AuthService {
 			refreshCookie.setMaxAge(86400000);
 			response.addCookie(refreshCookie);
 
+			logger.info("Login successful for user: {}", email);
+			
 			return ResponseEntity.ok(new AuthDto(
 					new AuthDto.UserInfo(userDetails.getUuid(), userDetails.getName(), user.getUsername(),
 							userDetails.getPicture(), userDetails.getAuthorities()),
@@ -132,7 +136,7 @@ public class AuthServiceImpl implements AuthService {
 
 	@Override
 	public ResponseEntity<?> validateRefreshToken(String refreshToken, HttpServletResponse response) {
-		logger.debug("refreshToken: " + refreshToken);
+		logger.info("refreshToken: " + refreshToken);
 		if (refreshToken == null) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 					.body("Refresh token missing in cookies");
@@ -181,8 +185,16 @@ public class AuthServiceImpl implements AuthService {
 			AuthenticationManager authenticationManager = authenticationConfiguration.getAuthenticationManager();
 			return authenticationManager.authenticate(
 					new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
-		} catch (Exception e) {
-			throw new RuntimeException("Authentication failed", e);
+		} catch (BadCredentialsException e) {
+			throw e;
+			// throw new IllegalArgumentException("Invalid email or password.", e); // 400
+			// Bad Request 또는 401 Unauthorized
+		} catch (AuthenticationException e) { // BadCredentialsException 외의 다른 인증 관련 예외 처리
+			throw e;
+			// throw new IllegalStateException("Authentication failed due to account status
+			// or other reasons.", e);
+		} catch (Exception e) { // 그 외 예상치 못한 모든 예외
+			throw new RuntimeException("An unexpected error occurred during authentication.", e); // 500 Internal Server Error
 		}
 	}
 }

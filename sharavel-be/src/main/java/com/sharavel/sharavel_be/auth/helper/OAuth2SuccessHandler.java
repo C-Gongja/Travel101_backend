@@ -41,7 +41,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 		Users authUser = userRepository.findByEmail(email).orElse(null);
 		CustomUserDetails userDetails = new CustomUserDetails(authUser);
 
-		String accessToken = jwtUtil.generateAccessToken(userDetails);
+		// String accessToken = jwtUtil.generateAccessToken(userDetails);
 		String refreshToken = jwtUtil.generateRefreshToken(userDetails);
 
 		// RefreshToken을 HttpOnly 쿠키로 설정
@@ -61,11 +61,11 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 				redirectUrl = new String(decodedBytes, StandardCharsets.UTF_8);
 
 				// // redirectUrl에 토큰 추가 (프론트엔드에서 사용할 수 있도록)
-				if (redirectUrl.contains("?")) {
-					redirectUrl += "&token=" + accessToken;
-				} else {
-					redirectUrl += "?token=" + accessToken;
-				}
+				// if (redirectUrl.contains("?")) {
+				// redirectUrl += "&token=" + accessToken;
+				// } else {
+				// redirectUrl += "?token=" + accessToken;
+				// }
 			} catch (IllegalArgumentException e) {
 				// 디코딩 실패 시 기본값 유지
 			}

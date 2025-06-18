@@ -1,12 +1,8 @@
 package com.sharavel.sharavel_be.auth.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,14 +30,8 @@ public class AuthController {
 
 	@PostMapping("/signin")
 	public ResponseEntity<?> login(@RequestBody @Valid SigninRequest request, HttpServletResponse response) {
-		try {
-			Authentication authentication = authService.authenticate(request);
-
-			return authService.login(authentication, response);
-
-		} catch (BadCredentialsException ex) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Login failed");
-		}
+		Authentication authentication = authService.authenticate(request);
+		return authService.login(authentication, response);
 	}
 
 	@PostMapping("/logout")

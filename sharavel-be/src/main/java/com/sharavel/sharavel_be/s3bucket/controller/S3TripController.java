@@ -88,22 +88,12 @@ public class S3TripController {
 			if (s3Key.contains(".")) {
 				String extension = s3Key.substring(s3Key.lastIndexOf(".") + 1).toLowerCase();
 				switch (extension) {
-					case "jpg":
-					case "jpeg":
-						contentType = MediaType.IMAGE_JPEG_VALUE;
-						break;
-					case "png":
-						contentType = MediaType.IMAGE_PNG_VALUE;
-						break;
-					case "gif":
-						contentType = MediaType.IMAGE_GIF_VALUE;
-						break;
-					case "mp4":
-						contentType = "video/mp4";
-						break;
-					case "mov":
-						contentType = "video/quicktime";
-						break;
+					case "jpg", "jpeg" -> contentType = MediaType.IMAGE_JPEG_VALUE;
+					case "png" -> contentType = MediaType.IMAGE_PNG_VALUE;
+					case "gif" -> contentType = MediaType.IMAGE_GIF_VALUE;
+					case "mp4" -> contentType = "video/mp4";
+					case "mov" -> contentType = "video/quicktime";
+					// 필요한 다른 타입 추가
 					// 필요한 다른 타입 추가
 				}
 			}
