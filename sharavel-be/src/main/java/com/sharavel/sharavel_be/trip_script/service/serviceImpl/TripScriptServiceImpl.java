@@ -122,6 +122,8 @@ public class TripScriptServiceImpl implements TripScriptService {
 
 		tripRepository.save(trip);
 		tripScriptRepository.save(script);
+
+		
 	}
 
 	@Override

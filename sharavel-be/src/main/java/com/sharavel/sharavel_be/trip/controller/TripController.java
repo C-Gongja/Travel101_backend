@@ -30,16 +30,11 @@ public class TripController {
 	private TripService tripService;
 
 	@PostMapping("/post")
-	public ResponseEntity<Map<String, Object>> createTrip(@RequestBody TripRequest trip) {
-		TripDto savedTrip = tripService.createTrip(trip);
-		String redirectUrl = "/trip/" + savedTrip.getTripUid();
+	public ResponseEntity<TripResponse> createTrip(@RequestBody TripRequest trip) {
+		TripResponse savedTrip = tripService.createTrip(trip);
+		// String redirectUrl = "/trip/" + savedTrip.getTrip().getTripUid();
 
-		Map<String, Object> response = new HashMap<>();
-		response.put("trip", savedTrip);
-		response.put("editable", true);
-		response.put("redirectUrl", redirectUrl);
-
-		return ResponseEntity.status(HttpStatus.CREATED).body(response);
+		return ResponseEntity.status(HttpStatus.CREATED).body(savedTrip);
 	}
 
 	@GetMapping("/{tripUid}")
@@ -60,10 +55,10 @@ public class TripController {
 	}
 
 	@PutMapping("/{tripUid}")
-	public ResponseEntity<TripDto> putTripField(
+	public ResponseEntity<TripResponse> putTripField(
 			@PathVariable String tripUid,
 			@RequestBody TripRequest updates) {
-		TripDto updatedTrip = tripService.putUpdatedTrip(tripUid, updates);
+		TripResponse updatedTrip = tripService.putUpdatedTrip(tripUid, updates);
 		return ResponseEntity.ok(updatedTrip);
 	}
 

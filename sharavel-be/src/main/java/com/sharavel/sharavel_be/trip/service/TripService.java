@@ -12,19 +12,19 @@ import com.sharavel.sharavel_be.trip.dto.response.TripRequest;
 import com.sharavel.sharavel_be.trip.dto.response.TripResponse;
 
 public interface TripService {
-	public TripDto createTrip(TripRequest trip);
+	public TripResponse createTrip(TripRequest trip);
 
 	public TripResponse getTripByUuid(String tripUid);
+
+	public TripResponse putUpdatedTrip(String tripUid, TripRequest updatedTrip);
+
+	public ResponseEntity<?> deleteTrip(String tripUid);
 
 	public List<TripListDto> getUserAllTrips(String userUuid);
 
 	public List<TripDto> getCloneTripsList(String userUid);
 
 	public List<TripListDto> getAllTrips();
-
-	public TripDto putUpdatedTrip(String tripUid, TripRequest updatedTrip);
-
-	public ResponseEntity<?> deleteTrip(String tripUid);
 
 	@Transactional
 	public TripDto updateTripField(String tripUid, Map<String, Object> updates);
