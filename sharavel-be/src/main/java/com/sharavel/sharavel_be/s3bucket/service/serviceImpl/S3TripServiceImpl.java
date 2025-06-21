@@ -17,7 +17,7 @@ import com.sharavel.sharavel_be.s3bucket.dto.response.S3TripMediaResponse;
 import com.sharavel.sharavel_be.s3bucket.entity.S3TripMedia;
 import com.sharavel.sharavel_be.s3bucket.entity.S3TripMedia.MediaType;
 import com.sharavel.sharavel_be.s3bucket.repository.S3TripMediaRepository;
-import com.sharavel.sharavel_be.s3bucket.service.S3BucketService;
+import com.sharavel.sharavel_be.s3bucket.service.S3TripService;
 import com.sharavel.sharavel_be.trip.entity.Trip;
 import com.sharavel.sharavel_be.trip.repository.TripRepository;
 import com.sharavel.sharavel_be.user.entity.Users;
@@ -37,7 +37,7 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequ
 
 @Service
 @Slf4j
-public class S3BucketServiceImpl implements S3BucketService {
+public class S3TripServiceImpl implements S3TripService {
 	@Autowired
 	private S3Client s3Client;
 	@Autowired

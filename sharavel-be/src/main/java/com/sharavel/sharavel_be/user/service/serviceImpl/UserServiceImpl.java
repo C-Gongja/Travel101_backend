@@ -1,5 +1,6 @@
 package com.sharavel.sharavel_be.user.service.serviceImpl;
 
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -19,6 +20,9 @@ import com.sharavel.sharavel_be.countries.mapper.CountryMapper;
 import com.sharavel.sharavel_be.countries.repository.CountryRepository;
 import com.sharavel.sharavel_be.follow.repository.UserFollowRepository;
 import com.sharavel.sharavel_be.follow.service.UserFollowService;
+import com.sharavel.sharavel_be.s3bucket.entity.S3UserMedia;
+import com.sharavel.sharavel_be.s3bucket.repository.S3ProfileRepository;
+import com.sharavel.sharavel_be.s3bucket.service.S3ProfileService;
 import com.sharavel.sharavel_be.security.CustomUserDetails;
 import com.sharavel.sharavel_be.security.util.JwtUtil;
 import com.sharavel.sharavel_be.socialLink.dto.SocialLinkDto;
@@ -45,6 +49,10 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private SocialLinkService socialLinksServicer;
 	@Autowired
+	private S3ProfileRepository s3ProfileRepository;
+	@Autowired
+	private S3ProfileService s3ProfileService;
+	@Autowired
 	private ObjectMapper objectMapper;
 
 	@Override
@@ -62,10 +70,14 @@ public class UserServiceImpl implements UserService {
 
 		// 새 accessToken 발급
 		String newAccessToken = jwtUtil.generateAccessToken(userDetails);
+		String picture = user.getPicture();
+		if (picture == null) {
+			picture = s3ProfileService.getS3UserProfileImg(user.getUuid());
+		}
 
 		return ResponseEntity.ok(new AuthDto(
 				new AuthDto.UserInfo(userDetails.getUuid(), userDetails.getName(), user.getUsername(),
-						userDetails.getPicture(), userDetails.getAuthorities()),
+						picture, userDetails.getAuthorities()),
 				newAccessToken));
 	}
 
@@ -93,7 +105,12 @@ public class UserServiceImpl implements UserService {
 				.map(CountryMapper::toDto)
 				.toList();
 
-		UserSnippetDto userSnippet = new UserSnippetDto(targetUser.getUuid(), targetUser.getName(),
+		String picture = targetUser.getPicture();
+		if (picture == null) {
+			picture = s3ProfileService.getS3UserProfileImg(targetUser.getUuid());
+		}
+		// 생성 후에는 unreferenced media가 없을 것이므로 deleteUnreferencedMedia 호출은 보통 생략
+		UserSnippetDto userSnippet = new UserSnippetDto(targetUser.getUuid(), picture, targetUser.getName(),
 				targetUser.getUsername(), isFollowing);
 
 		return new UserProfileDto(userSnippet, targetUser, countries, followingCount, followersCount);

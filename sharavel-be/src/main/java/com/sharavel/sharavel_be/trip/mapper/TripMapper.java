@@ -14,7 +14,7 @@ import com.sharavel.sharavel_be.likes.repository.LikesRepository;
 import com.sharavel.sharavel_be.s3bucket.dto.response.S3TripMediaResponse;
 import com.sharavel.sharavel_be.s3bucket.entity.S3TripMedia;
 import com.sharavel.sharavel_be.s3bucket.repository.S3TripMediaRepository;
-import com.sharavel.sharavel_be.s3bucket.service.S3BucketService;
+import com.sharavel.sharavel_be.s3bucket.service.S3TripService;
 import com.sharavel.sharavel_be.trip.dto.DaysDto;
 import com.sharavel.sharavel_be.trip.dto.LocationDto;
 import com.sharavel.sharavel_be.trip.dto.TripDto;
@@ -34,7 +34,7 @@ public class TripMapper {
 	@Autowired
 	private S3TripMediaRepository s3TripMediaRepository;
 	@Autowired
-	private S3BucketService s3BucketService;
+	private S3TripService s3BucketService;
 
 	public TripDto toDto(Trip trip, Users user) {
 		boolean isLiked = likesRepository.existsByTargetTypeAndTargetUidAndUser("TRIP", trip.getTripUid(), user);

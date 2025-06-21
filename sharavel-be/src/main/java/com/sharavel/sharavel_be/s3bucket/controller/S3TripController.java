@@ -22,13 +22,13 @@ import org.springframework.web.multipart.MultipartFile;
 import com.sharavel.sharavel_be.s3bucket.dto.response.S3TripMediaResponse;
 import com.sharavel.sharavel_be.s3bucket.entity.S3TripMedia;
 import com.sharavel.sharavel_be.s3bucket.repository.S3TripMediaRepository;
-import com.sharavel.sharavel_be.s3bucket.service.S3BucketService;
+import com.sharavel.sharavel_be.s3bucket.service.S3TripService;
 
 @RestController
 @RequestMapping("/api/s3")
 public class S3TripController {
 	@Autowired
-	private S3BucketService s3Service;
+	private S3TripService s3Service;
 	@Autowired
 	private S3TripMediaRepository tripMediaRepository; // DB 조회를 위해 주입
 

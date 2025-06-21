@@ -2,12 +2,14 @@ package com.sharavel.sharavel_be.user.dto;
 
 public class UserSnippetDto {
 	private String uuid;
+	private String picture;
 	private String name;
 	private String username;
 	private boolean isFollowing;
 
-	public UserSnippetDto(String uuid, String name, String username, boolean isFollowing) {
+	public UserSnippetDto(String uuid, String picture, String name, String username, boolean isFollowing) {
 		this.uuid = uuid;
+		this.picture = picture;
 		this.name = name;
 		this.username = username;
 		this.isFollowing = isFollowing;
@@ -19,6 +21,14 @@ public class UserSnippetDto {
 
 	public void setUuid(String uuid) {
 		this.uuid = uuid;
+	}
+
+	public String getPicture() {
+		return picture;
+	}
+
+	public void setPicture(String picture) {
+		this.picture = picture;
 	}
 
 	public String getName() {

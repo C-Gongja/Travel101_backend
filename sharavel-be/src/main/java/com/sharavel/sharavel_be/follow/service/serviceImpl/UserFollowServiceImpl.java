@@ -28,9 +28,10 @@ public class UserFollowServiceImpl implements UserFollowService {
 
 	@Autowired
 	private UserRepository userRepository;
-
 	@Autowired
 	private UserFollowRepository userFollowRepository;
+	@Autowired
+	private UserFollowMapper userFollowMapper;
 
 	private Users getCurrentUser() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -112,12 +113,15 @@ public class UserFollowServiceImpl implements UserFollowService {
 			currentUser = userRepository.findByEmail(email).orElse(null);
 		}
 		final Users finalCurrentUser = currentUser;
-
 		Pageable pageable = PageRequest.of(page, limit);
 		// targetUser의 followers 가져오기
-		Page<UserFollow> followers = userFollowRepository.findByFollowingUuid(targetUser.getUuid(), pageable);
+		// Page<UserFollow> followers =
+		// userFollowRepository.findByFollowingUuid(targetUser.getUuid(), pageable);
+		// return followers.map(f -> UserFollowMapper.toFollowerDto(f, finalCurrentUser,
+		// userFollowRepository));
 
-		return followers.map(f -> UserFollowMapper.toFollowerDto(f, finalCurrentUser, userFollowRepository));
+		return userFollowRepository.findByFollowingUuid(targetUser.getUuid(), pageable)
+				.map(follow -> userFollowMapper.toFollowerDto(follow, finalCurrentUser));
 	}
 
 	@Override
@@ -135,8 +139,9 @@ public class UserFollowServiceImpl implements UserFollowService {
 
 		Pageable pageable = PageRequest.of(page, limit);
 		// targetUser의 following 가져오기
-		Page<UserFollow> following = userFollowRepository.findByFollowerUuid(targetUser.getUuid(), pageable);
+		// Page<UserFollow> following = userFollowRepository.findByFollowerUuid(targetUser.getUuid(), pageable);
 
-		return following.map(f -> UserFollowMapper.toFollowingDto(f, finalCurrentUser, userFollowRepository));
+		return userFollowRepository.findByFollowingUuid(targetUser.getUuid(), pageable)
+				.map(follow -> userFollowMapper.toFollowingDto(follow, finalCurrentUser));
 	}
 }

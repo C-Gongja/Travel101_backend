@@ -9,20 +9,25 @@ import com.sharavel.sharavel_be.comments.dto.CommentsResponseDto;
 import com.sharavel.sharavel_be.comments.entity.Comment;
 import com.sharavel.sharavel_be.comments.repository.CommentRepository;
 import com.sharavel.sharavel_be.likes.repository.LikesRepository;
+import com.sharavel.sharavel_be.s3bucket.service.S3ProfileService;
 import com.sharavel.sharavel_be.user.entity.Users;
 
 @Component
 public class CommentMapper {
-
 	@Autowired
 	private LikesRepository likesRepository;
-
 	@Autowired
 	private CommentRepository commentRepository;
+	@Autowired
+	private S3ProfileService s3ProfileService;
 
 	public CommentsResponseDto toCommentsResponseDto(Comment comment, Users user) {
 		Comment parentComment = commentRepository.findByUid(comment.getUid()).orElseThrow();
 		Long childCount = commentRepository.countByParentAndDeletedFalse(parentComment);
+		String picture = comment.getUser().getPicture();
+		if (picture == null) {
+			picture = s3ProfileService.getS3UserProfileImg(comment.getUser().getUuid());
+		}
 
 		boolean isLiked = false;
 		if (user != null) {
@@ -33,7 +38,7 @@ public class CommentMapper {
 		return new CommentsResponseDto(
 				comment.getUid(),
 				comment.getContent(),
-				comment.getUser().getPicture(),
+				picture,
 				comment.getUser().getUsername(),
 				comment.getUser().getUuid(),
 				comment.getParent() != null ? comment.getParent().getUid() : null,
@@ -47,6 +52,10 @@ public class CommentMapper {
 		Comment parentComment = commentRepository.findByUid(comment.getUid()).orElseThrow();
 		Long childCount = commentRepository.countByParentAndDeletedFalse(parentComment);
 		boolean isLiked = false;
+		String picture = comment.getUser().getPicture();
+		if (picture == null) {
+			picture = s3ProfileService.getS3UserProfileImg(comment.getUser().getUuid());
+		}
 		if (user != null) {
 			isLiked = likesRepository.existsByTargetTypeAndTargetUidAndUser("COMMENT", comment.getUid(), user);
 		}
@@ -55,7 +64,7 @@ public class CommentMapper {
 		return new CommentsResponseDto(
 				comment.getUid(),
 				comment.getContent(),
-				comment.getUser().getPicture(),
+				picture,
 				comment.getUser().getUsername(),
 				comment.getUser().getUuid(),
 				comment.getParent() != null ? comment.getParent().getUid() : null,
@@ -66,10 +75,14 @@ public class CommentMapper {
 	}
 
 	public SingleCommentDto toSingleCommentDto(Comment comment) {
+		String picture = comment.getUser().getPicture();
+		if (picture == null) {
+			picture = s3ProfileService.getS3UserProfileImg(comment.getUser().getUuid());
+		}
 		return new SingleCommentDto(
 				comment.getUid(),
 				comment.getContent(),
-				comment.getUser().getPicture(),
+				picture,
 				comment.getUser().getUsername(),
 				comment.getTargetUid(),
 				comment.getCreatedAt(),

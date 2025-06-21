@@ -1,6 +1,5 @@
 package com.sharavel.sharavel_be.trip.service.serviceImpl;
 
-import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -31,8 +30,8 @@ import com.sharavel.sharavel_be.user.entity.Users;
 import com.sharavel.sharavel_be.user.repository.UserRepository;
 
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import com.sharavel.sharavel_be.s3bucket.service.S3ProfileService;
 
 @Service
 @Slf4j
@@ -40,20 +39,18 @@ public class TripServiceImpl implements TripService {
 
 	@Autowired
 	private TripRepository tripRepository;
-
 	@Autowired
 	private UserRepository userRepository;
-
 	@Autowired
 	private UserFollowRepository userFollowRepository;
-
+	@Autowired
+	private S3ProfileService s3ProfileService;
 	@Autowired
 	private TripMapper tripMapper;
-
 	@Autowired
 	private TripHelper tripHelper;
 
-	final static Logger logger = LoggerFactory.getLogger(TripServiceImpl.class);
+	// final static Logger logger = LoggerFactory.getLogger(TripServiceImpl.class);
 
 	private Users getCurrentUser() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -84,8 +81,13 @@ public class TripServiceImpl implements TripService {
 
 		userRepository.save(user);
 		Trip savedTrip = tripRepository.save(trip);
+
+		String picture = user.getPicture();
+		if (picture == null) {
+			picture = s3ProfileService.getS3UserProfileImg(user.getUuid());
+		}
 		// 생성 후에는 unreferenced media가 없을 것이므로 deleteUnreferencedMedia 호출은 보통 생략
-		UserSnippetDto userSnippet = new UserSnippetDto(user.getUuid(), user.getName(),
+		UserSnippetDto userSnippet = new UserSnippetDto(user.getUuid(), picture, user.getName(),
 				user.getUsername(), false);
 
 		TripResponse response = new TripResponse(tripMapper.toDto(savedTrip, user), true, userSnippet);
@@ -118,7 +120,12 @@ public class TripServiceImpl implements TripService {
 			isEditable = true;
 		}
 
-		UserSnippetDto userSnippet = new UserSnippetDto(tripOwner.getUuid(), tripOwner.getName(),
+		String picture = tripOwner.getPicture();
+		if (picture == null) {
+			picture = s3ProfileService.getS3UserProfileImg(tripOwner.getUuid());
+		}
+		// 생성 후에는 unreferenced media가 없을 것이므로 deleteUnreferencedMedia 호출은 보통 생략
+		UserSnippetDto userSnippet = new UserSnippetDto(tripOwner.getUuid(), picture, tripOwner.getName(),
 				tripOwner.getUsername(), isFollowing);
 
 		TripResponse response = new TripResponse(tripMapper.toDto(trip, currentUser), isEditable, userSnippet);
@@ -147,8 +154,12 @@ public class TripServiceImpl implements TripService {
 		userRepository.save(user);
 		Trip savedTrip = tripRepository.save(trip);
 
+		String picture = user.getPicture();
+		if (picture == null) {
+			picture = s3ProfileService.getS3UserProfileImg(user.getUuid());
+		}
 		// 생성 후에는 unreferenced media가 없을 것이므로 deleteUnreferencedMedia 호출은 보통 생략
-		UserSnippetDto userSnippet = new UserSnippetDto(user.getUuid(), user.getName(),
+		UserSnippetDto userSnippet = new UserSnippetDto(user.getUuid(), picture, user.getName(),
 				user.getUsername(), false);
 
 		TripResponse response = new TripResponse(tripMapper.toDto(savedTrip, user), true, userSnippet);
