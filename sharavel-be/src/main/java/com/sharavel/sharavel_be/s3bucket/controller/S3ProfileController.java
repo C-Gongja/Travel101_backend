@@ -23,7 +23,7 @@ public class S3ProfileController {
 
 	@PostMapping("/upload/{uuid}")
 	public ResponseEntity<?> uploadUserProfilePic(
-			@RequestParam("file") MultipartFile file,
+			@RequestParam("newProfilePic") MultipartFile file,
 			@PathVariable String uuid) {
 		try {
 			if (file == null || file.isEmpty()) {

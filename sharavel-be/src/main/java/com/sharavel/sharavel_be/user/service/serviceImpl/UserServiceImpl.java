@@ -70,9 +70,11 @@ public class UserServiceImpl implements UserService {
 
 		// 새 accessToken 발급
 		String newAccessToken = jwtUtil.generateAccessToken(userDetails);
+		
 		String picture = user.getPicture();
-		if (picture == null) {
-			picture = s3ProfileService.getS3UserProfileImg(user.getUuid());
+		if (picture != null && picture.startsWith("sharavel-profile:")) {
+			String s3Key = picture.replace("sharavel-profile:", "");
+			picture = s3ProfileService.generatePresignedUrl(s3Key, 604800).toString();
 		}
 
 		return ResponseEntity.ok(new AuthDto(
@@ -106,9 +108,11 @@ public class UserServiceImpl implements UserService {
 				.toList();
 
 		String picture = targetUser.getPicture();
-		if (picture == null) {
-			picture = s3ProfileService.getS3UserProfileImg(targetUser.getUuid());
+		if (picture != null && picture.startsWith("sharavel-profile:")) {
+			String s3Key = picture.replace("sharavel-profile:", "");
+			picture = s3ProfileService.generatePresignedUrl(s3Key, 604800).toString();
 		}
+
 		// 생성 후에는 unreferenced media가 없을 것이므로 deleteUnreferencedMedia 호출은 보통 생략
 		UserSnippetDto userSnippet = new UserSnippetDto(targetUser.getUuid(), picture, targetUser.getName(),
 				targetUser.getUsername(), isFollowing);
@@ -134,6 +138,10 @@ public class UserServiceImpl implements UserService {
 		String email = authentication.getName();
 		Users user = userRepository.findByEmail(email)
 				.orElseThrow(() -> new IllegalStateException("Create Trip User not found"));
+
+		if (!uuid.equals(user.getUuid())) {
+			throw new IllegalStateException("Invalid user request");
+		}
 
 		updates.forEach((key, value) -> {
 			switch (key) {

@@ -93,7 +93,7 @@ public class S3ProfileServiceImpl implements S3ProfileService {
 		}
 		// S3에 저장될 파일의 고유한 이름 생성 (UUID + 원본 확장자)
 		String s3Key = String.format("user/%s/profile/%s%s",
-				uuid, UUID.randomUUID().toString(), fileExtension);
+				user.getUuid(), UUID.randomUUID().toString(), fileExtension);
 		String contentType = file.getContentType();
 
 		try {
@@ -117,6 +117,9 @@ public class S3ProfileServiceImpl implements S3ProfileService {
 			userMedia.setUploadedAt(LocalDateTime.now());
 
 			s3ProfileRepostory.save(userMedia); // DB에 저장
+
+			user.setPicture("sharavel-profile:" + s3Key);
+			userRepository.save(user);
 
 			URL presignedUrl = generatePresignedUrl(s3Key, 604800);
 
