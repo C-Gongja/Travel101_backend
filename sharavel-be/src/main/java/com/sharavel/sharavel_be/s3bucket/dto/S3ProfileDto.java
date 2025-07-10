@@ -1,7 +1,5 @@
 package com.sharavel.sharavel_be.s3bucket.dto;
 
-import java.net.URL;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

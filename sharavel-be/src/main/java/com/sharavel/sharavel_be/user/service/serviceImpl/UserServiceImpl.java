@@ -1,6 +1,5 @@
 package com.sharavel.sharavel_be.user.service.serviceImpl;
 
-import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -20,8 +19,6 @@ import com.sharavel.sharavel_be.countries.mapper.CountryMapper;
 import com.sharavel.sharavel_be.countries.repository.CountryRepository;
 import com.sharavel.sharavel_be.follow.repository.UserFollowRepository;
 import com.sharavel.sharavel_be.follow.service.UserFollowService;
-import com.sharavel.sharavel_be.s3bucket.entity.S3UserMedia;
-import com.sharavel.sharavel_be.s3bucket.repository.S3ProfileRepository;
 import com.sharavel.sharavel_be.s3bucket.service.S3ProfileService;
 import com.sharavel.sharavel_be.security.CustomUserDetails;
 import com.sharavel.sharavel_be.security.util.JwtUtil;
@@ -49,8 +46,6 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private SocialLinkService socialLinksServicer;
 	@Autowired
-	private S3ProfileRepository s3ProfileRepository;
-	@Autowired
 	private S3ProfileService s3ProfileService;
 	@Autowired
 	private ObjectMapper objectMapper;
@@ -70,7 +65,7 @@ public class UserServiceImpl implements UserService {
 
 		// 새 accessToken 발급
 		String newAccessToken = jwtUtil.generateAccessToken(userDetails);
-		
+
 		String picture = user.getPicture();
 		if (picture != null && picture.startsWith("sharavel-profile:")) {
 			String s3Key = picture.replace("sharavel-profile:", "");

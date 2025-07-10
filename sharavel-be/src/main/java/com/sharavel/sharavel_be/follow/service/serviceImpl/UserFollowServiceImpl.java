@@ -139,9 +139,10 @@ public class UserFollowServiceImpl implements UserFollowService {
 
 		Pageable pageable = PageRequest.of(page, limit);
 		// targetUser의 following 가져오기
-		// Page<UserFollow> following = userFollowRepository.findByFollowerUuid(targetUser.getUuid(), pageable);
+		// Page<UserFollow> following =
+		// userFollowRepository.findByFollowerUuid(targetUser.getUuid(), pageable);
 
-		return userFollowRepository.findByFollowingUuid(targetUser.getUuid(), pageable)
+		return userFollowRepository.findByFollowerUuid(targetUser.getUuid(), pageable)
 				.map(follow -> userFollowMapper.toFollowingDto(follow, finalCurrentUser));
 	}
 }

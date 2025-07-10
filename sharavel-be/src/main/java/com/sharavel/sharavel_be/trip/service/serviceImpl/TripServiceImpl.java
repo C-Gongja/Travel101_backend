@@ -83,8 +83,9 @@ public class TripServiceImpl implements TripService {
 		Trip savedTrip = tripRepository.save(trip);
 
 		String picture = user.getPicture();
-		if (picture == null) {
-			picture = s3ProfileService.getS3UserProfileImg(user.getUuid());
+		if (picture != null && picture.startsWith("sharavel-profile:")) {
+			String s3Key = picture.replace("sharavel-profile:", "");
+			picture = s3ProfileService.generatePresignedUrl(s3Key, 604800).toString();
 		}
 		// 생성 후에는 unreferenced media가 없을 것이므로 deleteUnreferencedMedia 호출은 보통 생략
 		UserSnippetDto userSnippet = new UserSnippetDto(user.getUuid(), picture, user.getName(),
@@ -121,9 +122,11 @@ public class TripServiceImpl implements TripService {
 		}
 
 		String picture = tripOwner.getPicture();
-		if (picture == null) {
-			picture = s3ProfileService.getS3UserProfileImg(tripOwner.getUuid());
+		if (picture != null && picture.startsWith("sharavel-profile:")) {
+			String s3Key = picture.replace("sharavel-profile:", "");
+			picture = s3ProfileService.generatePresignedUrl(s3Key, 604800).toString();
 		}
+
 		// 생성 후에는 unreferenced media가 없을 것이므로 deleteUnreferencedMedia 호출은 보통 생략
 		UserSnippetDto userSnippet = new UserSnippetDto(tripOwner.getUuid(), picture, tripOwner.getName(),
 				tripOwner.getUsername(), isFollowing);
@@ -155,9 +158,11 @@ public class TripServiceImpl implements TripService {
 		Trip savedTrip = tripRepository.save(trip);
 
 		String picture = user.getPicture();
-		if (picture == null) {
-			picture = s3ProfileService.getS3UserProfileImg(user.getUuid());
+		if (picture != null && picture.startsWith("sharavel-profile:")) {
+			String s3Key = picture.replace("sharavel-profile:", "");
+			picture = s3ProfileService.generatePresignedUrl(s3Key, 604800).toString();
 		}
+
 		// 생성 후에는 unreferenced media가 없을 것이므로 deleteUnreferencedMedia 호출은 보통 생략
 		UserSnippetDto userSnippet = new UserSnippetDto(user.getUuid(), picture, user.getName(),
 				user.getUsername(), false);

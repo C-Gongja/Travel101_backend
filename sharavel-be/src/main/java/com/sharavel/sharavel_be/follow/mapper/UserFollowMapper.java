@@ -19,9 +19,11 @@ public class UserFollowMapper {
 	public UserSnippetDto toFollowerDto(UserFollow userFollow, Users currentUser) {
 		Users followerUser = userFollow.getFollower();
 		boolean isFollowing = false;
+
 		String picture = followerUser.getPicture();
-		if (picture == null) {
-			picture = s3ProfileService.getS3UserProfileImg(followerUser.getUuid());
+		if (picture != null && picture.startsWith("sharavel-profile:")) {
+			String s3Key = picture.replace("sharavel-profile:", "");
+			picture = s3ProfileService.generatePresignedUrl(s3Key, 604800).toString();
 		}
 
 		if (currentUser != null) {
@@ -39,9 +41,11 @@ public class UserFollowMapper {
 	public UserSnippetDto toFollowingDto(UserFollow userFollow, Users currentUser) {
 		Users followingUser = userFollow.getFollowing();
 		boolean isFollowing = false;
+
 		String picture = followingUser.getPicture();
-		if (picture == null) {
-			picture = s3ProfileService.getS3UserProfileImg(followingUser.getUuid());
+		if (picture != null && picture.startsWith("sharavel-profile:")) {
+			String s3Key = picture.replace("sharavel-profile:", "");
+			picture = s3ProfileService.generatePresignedUrl(s3Key, 604800).toString();
 		}
 
 		if (currentUser != null) {

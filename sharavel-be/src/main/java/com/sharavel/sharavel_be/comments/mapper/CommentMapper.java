@@ -24,9 +24,11 @@ public class CommentMapper {
 	public CommentsResponseDto toCommentsResponseDto(Comment comment, Users user) {
 		Comment parentComment = commentRepository.findByUid(comment.getUid()).orElseThrow();
 		Long childCount = commentRepository.countByParentAndDeletedFalse(parentComment);
+
 		String picture = comment.getUser().getPicture();
-		if (picture == null) {
-			picture = s3ProfileService.getS3UserProfileImg(comment.getUser().getUuid());
+		if (picture != null && picture.startsWith("sharavel-profile:")) {
+			String s3Key = picture.replace("sharavel-profile:", "");
+			picture = s3ProfileService.generatePresignedUrl(s3Key, 604800).toString();
 		}
 
 		boolean isLiked = false;
@@ -52,10 +54,13 @@ public class CommentMapper {
 		Comment parentComment = commentRepository.findByUid(comment.getUid()).orElseThrow();
 		Long childCount = commentRepository.countByParentAndDeletedFalse(parentComment);
 		boolean isLiked = false;
+
 		String picture = comment.getUser().getPicture();
-		if (picture == null) {
-			picture = s3ProfileService.getS3UserProfileImg(comment.getUser().getUuid());
+		if (picture != null && picture.startsWith("sharavel-profile:")) {
+			String s3Key = picture.replace("sharavel-profile:", "");
+			picture = s3ProfileService.generatePresignedUrl(s3Key, 604800).toString();
 		}
+
 		if (user != null) {
 			isLiked = likesRepository.existsByTargetTypeAndTargetUidAndUser("COMMENT", comment.getUid(), user);
 		}
@@ -76,8 +81,9 @@ public class CommentMapper {
 
 	public SingleCommentDto toSingleCommentDto(Comment comment) {
 		String picture = comment.getUser().getPicture();
-		if (picture == null) {
-			picture = s3ProfileService.getS3UserProfileImg(comment.getUser().getUuid());
+		if (picture != null && picture.startsWith("sharavel-profile:")) {
+			String s3Key = picture.replace("sharavel-profile:", "");
+			picture = s3ProfileService.generatePresignedUrl(s3Key, 604800).toString();
 		}
 		return new SingleCommentDto(
 				comment.getUid(),
