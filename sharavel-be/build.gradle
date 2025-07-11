@@ -37,6 +37,9 @@ dependencies {
     testCompileOnly 'org.projectlombok:lombok:1.18.38'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.38'
 
+		// dotenv
+		implementation "me.paulschwarz:spring-dotenv:4.0.0"
+
     // PostgreSQL
     runtimeOnly 'org.postgresql:postgresql'
 
@@ -63,6 +66,7 @@ dependencies {
     // Test Dependencies
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
+    testRuntimeOnly 'com.h2database:h2'
 }
 
 // QueryDSL 설정을 위한 블록 전체 제거 (또는 주석 처리)

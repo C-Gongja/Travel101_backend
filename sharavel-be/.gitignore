@@ -1,6 +1,7 @@
 HELP.md
 target/
 .gradle/
+*.env
 build/
 *.gradle.kts
 !**/src/main/**/target/
@@ -34,3 +35,5 @@ build/
 
 ### VS Code ###
 .vscode/
+
+docker-compose.yml
