@@ -4,6 +4,11 @@ public class CommentRootRequestDto {
 	private String targetUid;
 	private String targetType;
 
+	public CommentRootRequestDto(String targetUid, String targetType) {
+		this.targetUid = targetUid;
+		this.targetType = targetType;
+	}
+
 	public String getTargetUid() {
 		return targetUid;
 	}

@@ -62,6 +62,7 @@ public class CommentServiceImpl implements CommentService {
 		comment.setUser(currentUser);
 		comment.setContent(newComment.getContent());
 		comment.setCreatedAt(LocalDateTime.now());
+		
 		// 대댓글일 경우 parent 설정
 		if (newComment.getParentUid() != null) {
 			Comment parent = commentRepository.findByUid(newComment.getParentUid())

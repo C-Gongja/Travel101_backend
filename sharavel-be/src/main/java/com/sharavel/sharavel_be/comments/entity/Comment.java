@@ -32,7 +32,7 @@ public class Comment {
 	@PrePersist
 	public void generateUUID() {
 		if (this.uid == null) {
-			this.uid = UUID.randomUUID().toString(); // UUID 자동 생성
+			this.uid = UUID.randomUUID().toString();
 		}
 	}
 

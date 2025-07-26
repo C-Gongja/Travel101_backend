@@ -1,17 +1,19 @@
 package com.sharavel.sharavel_be.comments.dto;
 
-// uid: originalComment.uid,
-// targetType: targetType,
-// targetUid: targetUid,
-// content: newCommentText.trim(),
-// parentUid: originalComment.parentUid || null,
-
 public class CommentEditRequestDto {
 	private String uid;
 	private String targetType;
 	private String targetUid;
 	private String content;
 	private String parentUid;
+
+	public CommentEditRequestDto(String content, String parentUid, String targetType, String targetUid, String uid) {
+		this.content = content;
+		this.parentUid = parentUid;
+		this.targetType = targetType;
+		this.targetUid = targetUid;
+		this.uid = uid;
+	}
 
 	public String getUid() {
 		return uid;
