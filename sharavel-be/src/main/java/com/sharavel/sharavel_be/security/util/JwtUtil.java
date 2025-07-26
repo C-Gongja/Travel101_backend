@@ -96,20 +96,40 @@ public class JwtUtil {
 	}
 
 	public String extractUsername(String token) {
-		return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
+		return Jwts
+				.parserBuilder()
+				.setSigningKey(getSignInKey())
+				.build()
+				.parseClaimsJws(token)
+				.getBody()
+				.getSubject();
 	}
 
 	public String extractName(String token) {
-		return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().get("name", String.class);
+		return Jwts
+				.parserBuilder()
+				.setSigningKey(getSignInKey())
+				.build().parseClaimsJws(token)
+				.getBody()
+				.get("name", String.class);
 	}
 
 	@SuppressWarnings("unchecked")
 	public List<String> extractRoles(String token) {
-		return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().get("roles", List.class);
+		return Jwts
+				.parserBuilder()
+				.setSigningKey(getSignInKey())
+				.build().parseClaimsJws(token)
+				.getBody()
+				.get("roles", List.class);
 	}
 
 	public boolean isRefreshToken(String token) {
-		Claims claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+		Claims claims = Jwts
+				.parserBuilder()
+				.setSigningKey(getSignInKey())
+				.build().parseClaimsJws(token)
+				.getBody();
 		return "refresh".equals(claims.get("type"));
 	}
 }

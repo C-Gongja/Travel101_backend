@@ -1,9 +1,11 @@
 HELP.md
 target/
-.gradle/
+*.gradle/
 *.env
 build/
 *.gradle.kts
+!gradle/wrapper/gradle-wrapper.jar
+.gradle-cache/
 !**/src/main/**/target/
 !**/src/test/**/target/
 src/main/resources/

@@ -68,7 +68,7 @@ public class S3TripController {
 
 	@GetMapping("/trip/{tripUid}/media-urls")
 	public ResponseEntity<List<String>> getTripMediaUrls(@PathVariable String tripUid) {
-		// 1. DB에서 해당 tripId에 연결된 모든 TripMedia 객체 조회
+		// 1. DB에서 해당 tripId에 연결된 모든 TripMedia 객체 조회 AWS_ACCESS_KEY
 		List<S3TripMedia> mediaList = tripMediaRepository.findByTripUid(tripUid);
 
 		// 2. 각 TripMedia 객체의 S3 Key를 사용하여 Presigned URL 생성
@@ -93,13 +93,11 @@ public class S3TripController {
 					case "gif" -> contentType = MediaType.IMAGE_GIF_VALUE;
 					case "mp4" -> contentType = "video/mp4";
 					case "mov" -> contentType = "video/quicktime";
-					// 필요한 다른 타입 추가
-					// 필요한 다른 타입 추가
 				}
 			}
 
 			return ResponseEntity.ok()
-					.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + s3Key + "\"") // 다운로드될 파일 이름
+					.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + s3Key + "\"")
 					.contentType(MediaType.parseMediaType(contentType)) // 파일의 실제 MIME 타입
 					.body(fileBytes);
 		} catch (RuntimeException e) {

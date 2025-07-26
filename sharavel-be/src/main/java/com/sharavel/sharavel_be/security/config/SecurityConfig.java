@@ -52,7 +52,7 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
-				.csrf(csrf -> csrf.disable()) // 개발 시 CSRF 보호를 비활성화
+				.csrf(csrf -> csrf.disable()) // CSRF disabled for dev env
 				.exceptionHandling(exceptions -> exceptions.authenticationEntryPoint(jwtAuthEntryPoint))
 				// Set session management to stateless why? this is jwt
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -69,19 +69,22 @@ public class SecurityConfig {
 						.userInfoEndpoint(userInfo -> userInfo
 								.userService(customOAuth2UserService))
 						.successHandler(oAuth2SuccessHandler));
-		http.authenticationProvider(authenticationProvider()); // Custom authentication provider
+		http.authenticationProvider(authenticationProvider(userDetailsService, passwordEncoder));
 		http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 		http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
 
 		return http.build();
 	}
 
+	// Custom authentication provider
 	@Bean
-	public AuthenticationProvider authenticationProvider() {
-		DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-		authenticationProvider.setUserDetailsService(userDetailsService);
-		authenticationProvider.setPasswordEncoder(passwordEncoder);
-		return authenticationProvider;
+	public AuthenticationProvider authenticationProvider(
+			UserDetailsService userDetailsService,
+			PasswordEncoder passwordEncoder) {
+		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+		authProvider.setUserDetailsService(userDetailsService);
+		authProvider.setPasswordEncoder(passwordEncoder);
+		return authProvider;
 	}
 
 	@Bean

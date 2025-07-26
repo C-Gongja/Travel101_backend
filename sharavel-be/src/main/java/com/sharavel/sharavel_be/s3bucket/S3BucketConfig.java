@@ -39,8 +39,7 @@ public class S3BucketConfig {
 				.build();
 	}
 
-	// Presigned URL 생성을 위해 S3Presigner 빈을 별도로 정의하는 것이 좋습니다.
-	// s3Client 빈이 의존하는 region을 사용하도록 설정할 수 있습니다.
+	// Presigned URL 생성을 위해 S3Presigner 빈을 별도로 정의. (s3Client 빈이 의존하는 region을 사용하도록 설정할 수 있음.)
 	@Bean
 	public S3Presigner s3Presigner(S3Client s3Client) { // S3Client 빈을 주입받아 동일한 설정 사용
 		// S3Client의 설정(리전, 자격 증명)을 S3Presigner에도 적용하여 일관성을 유지합니다.

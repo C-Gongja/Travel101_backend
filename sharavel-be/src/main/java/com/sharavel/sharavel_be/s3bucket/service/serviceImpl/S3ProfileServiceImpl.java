@@ -133,7 +133,7 @@ public class S3ProfileServiceImpl implements S3ProfileService {
 		} catch (S3Exception e) {
 			// S3 서비스에서 발생할 수 있는 에러 (예: 권한 없음, 버킷 없음 등)
 			throw new RuntimeException("S3 업로드 중 오류가 발생했습니다: " + e.awsErrorDetails().errorMessage(), e);
-		} catch (Exception e) {
+		} catch (Error e) {
 			// 그 외 예상치 못한 에러
 			throw new RuntimeException("파일 업로드 및 DB 저장 중 알 수 없는 오류 발생: " + e.getMessage(), e);
 		}
