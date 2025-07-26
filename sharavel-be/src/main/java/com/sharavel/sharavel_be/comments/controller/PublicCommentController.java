@@ -7,21 +7,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sharavel.sharavel_be.comments.service.CommentService;
+import com.sharavel.sharavel_be.comments.service.PublicCommentService;
 
 @RestController
 @RequestMapping("/public/comment")
 public class PublicCommentController {
 	@Autowired
-	private CommentService CommentService;
+	private PublicCommentService publicCommentService;
 
 	@GetMapping("/getTripRootComments")
 	public ResponseEntity<?> getRootComments(@RequestParam String targetType, @RequestParam String targetUid) {
-		return CommentService.getRootComments(targetType, targetUid);
+		return publicCommentService.getRootComments(targetType, targetUid);
 	}
 
 	@GetMapping("/getTripCommentReplies")
 	public ResponseEntity<?> getRootRepliesComments(@RequestParam String parentUid) {
-		return CommentService.getReplies(parentUid);
+		return publicCommentService.getReplies(parentUid);
 	}
 }

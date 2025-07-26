@@ -11,8 +11,4 @@ public interface CommentService {
 	public ResponseEntity<?> updateComment(CommentEditRequestDto editComment);
 
 	public ResponseEntity<?> softDeleteComment(String targetUid);
-
-	public ResponseEntity<?> getRootComments(String targetType, String targetUid);
-
-	public ResponseEntity<?> getReplies(String parentUid);
 }

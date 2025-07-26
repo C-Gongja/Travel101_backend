@@ -12,14 +12,14 @@ import com.sharavel.sharavel_be.comments.entity.Comment;
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 	Optional<Comment> findByUid(String uid);
 
-	List<Comment> findByTargetTypeAndTargetUidAndParentIsNullAndDeletedFalseOrderByCreatedAtAsc(String targetType,
+	List<Comment> findByTargetTypeAndTargetUidAndParentIsNullAndDeletedFalseOrderByCreatedAtDesc(String targetType,
 			String targetUid);
 
-	List<Comment> findByParentAndDeletedFalseOrderByCreatedAtAsc(Comment parent);
+	List<Comment> findByParentAndDeletedFalseOrderByCreatedAtDesc(Comment parent);
 
 	Long countByParentAndDeletedFalse(Comment parent);
 
-	List<Comment> findByTargetTypeAndTargetUidOrderByCreatedAtAsc(String targetType, String targetUid);
+	List<Comment> findByTargetTypeAndTargetUidOrderByCreatedAtDesc(String targetType, String targetUid);
 
 	Long countByTargetTypeAndTargetUidAndDeletedFalse(String targetType, String targetUid);
 
