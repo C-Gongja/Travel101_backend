@@ -1,4 +1,4 @@
-package com.sharavel.sharavel_be.security;
+package com.sharavel.sharavel_be.auth.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

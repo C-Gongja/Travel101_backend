@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sharavel.sharavel_be.auth.dto.SigninRequest;
+import com.sharavel.sharavel_be.auth.dto.SignupRequest;
 import com.sharavel.sharavel_be.auth.service.AuthService;
-import com.sharavel.sharavel_be.security.SigninRequest;
-import com.sharavel.sharavel_be.security.SignupRequest;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;

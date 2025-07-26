@@ -18,10 +18,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.sharavel.sharavel_be.auth.dto.AuthDto;
+import com.sharavel.sharavel_be.auth.dto.SigninRequest;
+import com.sharavel.sharavel_be.auth.dto.SignupRequest;
 import com.sharavel.sharavel_be.auth.service.AuthService;
 import com.sharavel.sharavel_be.security.CustomUserDetails;
-import com.sharavel.sharavel_be.security.SigninRequest;
-import com.sharavel.sharavel_be.security.SignupRequest;
 import com.sharavel.sharavel_be.security.util.JwtUtil;
 import com.sharavel.sharavel_be.user.entity.Roles;
 import com.sharavel.sharavel_be.user.entity.Users;
@@ -54,6 +54,15 @@ public class AuthServiceImpl implements AuthService {
 		this.authenticationConfiguration = authenticationConfiguration;
 	}
 
+	private Cookie generateCookie(String refreshToken) {
+		Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
+		refreshCookie.setHttpOnly(true);
+		refreshCookie.setSecure(false); // dev env
+		refreshCookie.setPath("/");
+		refreshCookie.setMaxAge(86400000); // 7days
+		return refreshCookie;
+	}
+
 	@Override
 	public ResponseEntity<?> signup(SignupRequest request, HttpServletResponse response) {
 		if (userRepository.existsByEmail(request.getEmail())) {
@@ -83,11 +92,7 @@ public class AuthServiceImpl implements AuthService {
 		String accessToken = jwtUtil.generateAccessToken(userDetails);
 		String refreshToken = jwtUtil.generateRefreshToken(userDetails);
 
-		Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
-		refreshCookie.setHttpOnly(true);
-		refreshCookie.setSecure(false); // 개발 환경
-		refreshCookie.setPath("/");
-		refreshCookie.setMaxAge(86400000);
+		Cookie refreshCookie = generateCookie(refreshToken);
 		response.addCookie(refreshCookie);
 
 		return ResponseEntity.ok(new AuthDto(
@@ -107,22 +112,15 @@ public class AuthServiceImpl implements AuthService {
 						.body("User not found");
 			}
 
-			// 어떻게 유저 정보를 사용할것인지 Entity를 사용할것인지 CustomUserDetails을 사용할것인지
 			CustomUserDetails userDetails = new CustomUserDetails(user);
 
-			// make user token contains only name and roles
+			// token contains only name and roles
 			String accessToken = jwtUtil.generateAccessToken(userDetails);
 			String refreshToken = jwtUtil.generateRefreshToken(userDetails);
 
-			Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
-			refreshCookie.setHttpOnly(true); // JavaScript 접근 방지
-			refreshCookie.setSecure(true); // HTTPS에서만 전송 (개발 환경 제외)
-			refreshCookie.setPath("/"); // 전체 경로에서 사용
-			refreshCookie.setMaxAge(86400000);
+			Cookie refreshCookie = generateCookie(refreshToken);
 			response.addCookie(refreshCookie);
 
-			logger.info("Login successful for user: {}", email);
-			
 			return ResponseEntity.ok(new AuthDto(
 					new AuthDto.UserInfo(userDetails.getUuid(), userDetails.getName(), user.getUsername(),
 							userDetails.getPicture(), userDetails.getAuthorities()),
@@ -162,11 +160,7 @@ public class AuthServiceImpl implements AuthService {
 			// get new refreshToken
 			String newRefreshToken = jwtUtil.generateRefreshToken(userDetails);
 
-			Cookie refreshCookie = new Cookie("refreshToken", newRefreshToken);
-			refreshCookie.setHttpOnly(true); // JavaScript 접근 방지
-			refreshCookie.setSecure(false); // HTTPS에서만 전송 (개발 환경 제외)
-			refreshCookie.setPath("/"); // 전체 경로에서 사용
-			refreshCookie.setMaxAge(86400000);
+			Cookie refreshCookie = generateCookie(newRefreshToken);
 			response.addCookie(refreshCookie);
 
 			return ResponseEntity.ok(new AuthDto(
@@ -186,13 +180,11 @@ public class AuthServiceImpl implements AuthService {
 			return authenticationManager.authenticate(
 					new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 		} catch (BadCredentialsException e) {
-			throw e;
-			// throw new IllegalArgumentException("Invalid email or password.", e); // 400
-			// Bad Request 또는 401 Unauthorized
-		} catch (AuthenticationException e) { // BadCredentialsException 외의 다른 인증 관련 예외 처리
-			throw e;
-			// throw new IllegalStateException("Authentication failed due to account status
-			// or other reasons.", e);
+			// throw e;
+			throw new IllegalArgumentException("Invalid email or password.", e); // 400
+		} catch (AuthenticationException e) {
+			// throw e;
+			throw new IllegalStateException("Authentication failed", e); // 401 Unauthorized
 		} catch (Exception e) { // 그 외 예상치 못한 모든 예외
 			throw new RuntimeException("An unexpected error occurred during authentication.", e); // 500 Internal Server Error
 		}

@@ -4,8 +4,6 @@ import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -68,23 +66,18 @@ public class SecurityConfig {
 										new CustomAuthorizationRequestResolver(clientRegistrationRepository, "/oauth2/authorization")))
 						.userInfoEndpoint(userInfo -> userInfo
 								.userService(customOAuth2UserService))
-						.successHandler(oAuth2SuccessHandler));
-		http.authenticationProvider(authenticationProvider(userDetailsService, passwordEncoder));
+						.successHandler(oAuth2SuccessHandler))
+				// Configure AuthenticationManager with UserDetailsService and PasswordEncoder
+				.authenticationManager(http.getSharedObject(
+						org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder.class)
+						.userDetailsService(userDetailsService)
+						.passwordEncoder(passwordEncoder)
+						.and()
+						.build());
 		http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 		http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
 
 		return http.build();
-	}
-
-	// Custom authentication provider
-	@Bean
-	public AuthenticationProvider authenticationProvider(
-			UserDetailsService userDetailsService,
-			PasswordEncoder passwordEncoder) {
-		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-		authProvider.setUserDetailsService(userDetailsService);
-		authProvider.setPasswordEncoder(passwordEncoder);
-		return authProvider;
 	}
 
 	@Bean

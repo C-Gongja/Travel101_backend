@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -21,6 +23,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Component
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
+	private static final Logger logger = LoggerFactory.getLogger(OAuth2SuccessHandler.class);
 
 	private final JwtUtil jwtUtil;
 	private final UserRepository userRepository;
@@ -30,7 +33,6 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 		this.userRepository = userRepository;
 	}
 
-	// send accessToken and refreshToken as custom auth
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
 			Authentication authentication) throws IOException, ServletException {
@@ -38,18 +40,17 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 		OAuth2User user = (OAuth2User) authentication.getPrincipal();
 		String email = user.getAttribute("email");
 
-		Users authUser = userRepository.findByEmail(email).orElse(null);
+		Users authUser = userRepository.findByEmail(email)
+				.orElseThrow(() -> new IllegalArgumentException("User not found for email: " + email));
 		CustomUserDetails userDetails = new CustomUserDetails(authUser);
 
-		// String accessToken = jwtUtil.generateAccessToken(userDetails);
 		String refreshToken = jwtUtil.generateRefreshToken(userDetails);
 
-		// RefreshToken을 HttpOnly 쿠키로 설정
 		Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
 		refreshCookie.setHttpOnly(true);
-		refreshCookie.setSecure(false); // 개발 환경에서는 false로 할 수도 있음
+		refreshCookie.setSecure(false); // false for dev env
 		refreshCookie.setPath("/");
-		refreshCookie.setMaxAge(86400000); // 7일
+		refreshCookie.setMaxAge(86400000); // 7days
 		response.addCookie(refreshCookie);
 
 		String state = request.getParameter("state");
@@ -59,15 +60,8 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 			try {
 				byte[] decodedBytes = Base64.getUrlDecoder().decode(state);
 				redirectUrl = new String(decodedBytes, StandardCharsets.UTF_8);
-
-				// // redirectUrl에 토큰 추가 (프론트엔드에서 사용할 수 있도록)
-				// if (redirectUrl.contains("?")) {
-				// redirectUrl += "&token=" + accessToken;
-				// } else {
-				// redirectUrl += "?token=" + accessToken;
-				// }
 			} catch (IllegalArgumentException e) {
-				// 디코딩 실패 시 기본값 유지
+				logger.warn("Invalid state parameter: {}. Falling back to default redirect URL.", state, e);
 			}
 		}
 

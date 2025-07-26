@@ -3,8 +3,8 @@ package com.sharavel.sharavel_be.auth.service;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 
-import com.sharavel.sharavel_be.security.SigninRequest;
-import com.sharavel.sharavel_be.security.SignupRequest;
+import com.sharavel.sharavel_be.auth.dto.SigninRequest;
+import com.sharavel.sharavel_be.auth.dto.SignupRequest;
 
 import jakarta.servlet.http.HttpServletResponse;
 
