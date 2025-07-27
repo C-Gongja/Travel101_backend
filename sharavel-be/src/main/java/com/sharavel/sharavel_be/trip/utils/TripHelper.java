@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.sharavel.sharavel_be.countries.dto.CountryCodeDto;
@@ -31,8 +30,8 @@ import com.sharavel.sharavel_be.trip.entity.Locations;
 import com.sharavel.sharavel_be.trip.entity.Trip;
 import com.sharavel.sharavel_be.user.entity.Users;
 
-@Component // 스프링 빈으로 등록
-public class TripHelper { // TripUtils 대신 TripHelper나 TripModifier와 같은 이름이 더 적합할 수 있음
+@Component
+public class TripHelper {
 
 	private static final Logger logger = LoggerFactory.getLogger(TripHelper.class);
 
@@ -81,12 +80,12 @@ public class TripHelper { // TripUtils 대신 TripHelper나 TripModifier와 같�
 			Integer currentTripDays = Math.toIntExact(daysBetween);
 
 			// Handle null for getTotalTripDays and getTotalTrips
-			Integer currentTotalTripDays = user.getTotalTripDays() != null ? user.getTotalTripDays() : 0;
-			Integer currentTotalTrips = user.getTotalTrips() != null ? user.getTotalTrips() : 0;
+			Integer currentTotalTripDays = user.getTotalTripDays();
+			Integer currentTotalTrips = user.getTotalTrips();
 
 			// Subtract days and trips, ensuring non-negative results
-			user.setTotalTripDays(Math.max(0, currentTotalTripDays - currentTripDays));
-			user.setTotalTrips(Math.max(0, currentTotalTrips - 1));
+			user.updateTotalTripDays(Math.max(0, currentTotalTripDays - currentTripDays), user.getUuid());
+			user.updateTotalTrips(Math.max(0, currentTotalTrips - 1), user.getUuid());
 		}
 	}
 
@@ -113,11 +112,11 @@ public class TripHelper { // TripUtils 대신 TripHelper나 TripModifier와 같�
 			Integer updatedTripDays = Math.toIntExact(daysBetween);
 
 			// Update user stats (handle null for getTotalTripDays and getTotalTrips)
-			Integer currentTotalTripDays = user.getTotalTripDays() != null ? user.getTotalTripDays() : 0;
-			Integer currentTotalTrips = user.getTotalTrips() != null ? user.getTotalTrips() : 0;
+			Integer currentTotalTripDays = user.getTotalTripDays();
+			Integer currentTotalTrips = user.getTotalTrips();
 
-			user.setTotalTripDays(currentTotalTripDays + updatedTripDays);
-			user.setTotalTrips(currentTotalTrips + 1);
+			user.updateTotalTripDays((currentTotalTripDays + updatedTripDays), user.getUuid());
+			user.updateTotalTrips((currentTotalTrips + 1), user.getUuid());
 			trip.setCompleted(true);
 		} else {
 			trip.setCompleted(false);

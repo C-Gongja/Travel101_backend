@@ -1,6 +1,5 @@
 package com.sharavel.sharavel_be.auth.service;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -50,20 +49,15 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 		// 저장 또는 업데이트
 		Users user = userRepository.findByEmail(email)
 				.orElseGet(() -> {
-					Users newUser = new Users();
-					newUser.setEmail(email);
-					newUser.setName(name);
-					newUser.setUsername(randomUsername);
-					newUser.setPicture(picture);
-					newUser.setProvider("google");
-					newUser.setProviderId(providerId);
-					newUser.setTotalTripDays(0);
-					newUser.setTotalTrips(0);
-					newUser.setCreatedAt(LocalDateTime.now());
-
 					Roles userRole = roleRepository.findByName(RoleConstants.ROLE_USER)
 							.orElseThrow(() -> new IllegalStateException("USER role Internal Error"));
-					newUser.setRoles(Collections.singleton(userRole));
+
+					Users newUser = new Users.Builder(email, name, randomUsername, 0, 0)
+							.picture(picture)
+							.provider("google")
+							.providerId(providerId)
+							.roles(Collections.singleton(userRole))
+							.build();
 					return userRepository.save(newUser);
 				});
 

@@ -1,6 +1,5 @@
 package com.sharavel.sharavel_be.auth.service.serviceImpl;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 
 import org.slf4j.Logger;
@@ -70,20 +69,14 @@ public class AuthServiceImpl implements AuthService {
 					.body(("Email is already taken"));
 		}
 
-		Users newUser = new Users();
-		newUser.setName(request.getName());
-
 		String randomUsername = userService.generateRandomUsername(request.getName());
-		newUser.setUsername(randomUsername);
-		newUser.setEmail(request.getEmail());
-		newUser.setPassword(passwordEncoder.encode(request.getPassword()));
-		newUser.setTotalTripDays(0);
-		newUser.setTotalTrips(0);
-		newUser.setCreatedAt(LocalDateTime.now());
-
 		Roles userRole = roleRepository.findByName(RoleConstants.ROLE_USER)
 				.orElseThrow(() -> new IllegalStateException("USER role Internal Error"));
-		newUser.setRoles(Collections.singleton(userRole));
+
+		Users newUser = new Users.Builder(request.getEmail(), request.getName(), randomUsername, 0, 0)
+				.password(passwordEncoder.encode(request.getPassword()))
+				.roles(Collections.singleton(userRole))
+				.build();
 
 		Users savedUser = userRepository.save(newUser);
 

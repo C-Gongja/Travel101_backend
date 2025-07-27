@@ -1,5 +1,7 @@
 package com.sharavel.sharavel_be.exceptions;
 
+import java.time.LocalDateTime;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -19,7 +21,8 @@ public class AuthExceptions {
 	public ResponseEntity<ErrorResponse> handleResponseStatusException(ResponseStatusException ex) {
 		log.warn("ResponseStatusException: Status={} Reason={}", ex.getStatusCode(), ex.getReason());
 		// errorCode는 필요에 따라 ex.getReason()을 기반으로 생성하거나 고정값 사용
-		ErrorResponse error = new ErrorResponse(ex.getStatusCode().value(), ex.getReason(), "API_ERROR");
+		ErrorResponse error = new ErrorResponse(ex.getStatusCode().value(), ex.getReason(), "API_ERROR",
+				LocalDateTime.now());
 		return new ResponseEntity<>(error, ex.getStatusCode());
 	}
 
@@ -27,7 +30,7 @@ public class AuthExceptions {
 	public ResponseEntity<ErrorResponse> handleBadCredentialsException(BadCredentialsException ex) {
 		log.warn("Authentication failed - Bad Credentials: {}", ex.getMessage());
 		ErrorResponse error = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "Invalid email or password.",
-				"INVALID_CREDENTIALS");
+				"INVALID_CREDENTIALS", LocalDateTime.now());
 		return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
 	}
 
@@ -37,7 +40,7 @@ public class AuthExceptions {
 		ErrorResponse error = new ErrorResponse(
 				HttpStatus.INTERNAL_SERVER_ERROR.value(),
 				"An internal server error occurred due to an invalid state. Please try again later.",
-				"ILLEGAL_STATE");
+				"ILLEGAL_STATE", LocalDateTime.now());
 		return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
@@ -47,7 +50,7 @@ public class AuthExceptions {
 		ErrorResponse error = new ErrorResponse(
 				HttpStatus.INTERNAL_SERVER_ERROR.value(),
 				"An unexpected error occurred. Please try again later.",
-				"UNEXPECTED_ERROR");
+				"UNEXPECTED_ERROR", LocalDateTime.now());
 		return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 }

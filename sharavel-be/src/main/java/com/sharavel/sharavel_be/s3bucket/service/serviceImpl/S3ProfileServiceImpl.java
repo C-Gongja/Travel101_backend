@@ -118,7 +118,7 @@ public class S3ProfileServiceImpl implements S3ProfileService {
 
 			s3ProfileRepostory.save(userMedia); // DB에 저장
 
-			user.setPicture("sharavel-profile:" + s3Key);
+			user.updatePicture(("sharavel-profile:" + s3Key), uuid);
 			userRepository.save(user);
 
 			URL presignedUrl = generatePresignedUrl(s3Key, 604800);

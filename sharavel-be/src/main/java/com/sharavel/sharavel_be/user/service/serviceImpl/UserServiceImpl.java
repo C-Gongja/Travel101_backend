@@ -133,24 +133,25 @@ public class UserServiceImpl implements UserService {
 		String email = authentication.getName();
 		Users user = userRepository.findByEmail(email)
 				.orElseThrow(() -> new IllegalStateException("Create Trip User not found"));
+		String userUuid = user.getUuid();
 
-		if (!uuid.equals(user.getUuid())) {
+		if (!uuid.equals(userUuid)) {
 			throw new IllegalStateException("Invalid user request");
 		}
 
 		updates.forEach((key, value) -> {
 			switch (key) {
-				case "name" -> user.setName((String) value);
+				case "name" -> user.updateName((String) value, userUuid);
 				case "username" -> {
 					String newUsername = (String) value;
 					if (checkUniqueUsername(newUsername)) {
-						user.setUsername(newUsername);
+						user.updateUsername(newUsername, userUuid, userRepository);
 					} else {
 						throw new IllegalArgumentException("'" + newUsername + "' already exists.");
 					}
 				}
-				case "email" -> user.setEmail((String) value);
-				case "country" -> user.setCountry((String) value);
+				case "email" -> user.updateEmail((String) value, userUuid, userRepository);
+				case "country" -> user.updateCountry((String) value, userUuid);
 				case "socialLinks" -> {
 					if (value instanceof List<?>) {
 						try {
@@ -166,7 +167,7 @@ public class UserServiceImpl implements UserService {
 						throw new IllegalArgumentException("Expected socialLinks to be a list");
 					}
 				}
-				case "bio" -> user.setBio((String) value);
+				case "bio" -> user.updateBio((String) value, userUuid);
 				default -> {
 					throw new IllegalArgumentException("Unknown field: " + key);
 				}
