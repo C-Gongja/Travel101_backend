@@ -1,7 +1,5 @@
 package com.sharavel.sharavel_be.comments.service.serivceImpl;
 
-import java.time.LocalDateTime;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -74,19 +72,21 @@ public class CommentServiceImpl implements CommentService {
 	@Override
 	public ResponseEntity<?> addComment(CommentRequestDto newComment) {
 		Users currentUser = getCurrentUser();
-		Comment comment = new Comment();
-		comment.setTargetType(newComment.getTargetType());
-		comment.setTargetUid(newComment.getTargetUid());
-		comment.setUser(currentUser);
-		comment.setContent(newComment.getContent());
-		comment.setCreatedAt(LocalDateTime.now());
+		Comment parent = null;
+		if (newComment.getParentUid() != null) {
+			parent = commentRepository.findByUid(newComment.getParentUid())
+					.orElseThrow(() -> new IllegalArgumentException("Parent comment not found"));
+		}
+
+		Comment comment = new Comment.Builder(
+				newComment.getTargetType(),
+				newComment.getTargetUid(),
+				currentUser,
+				newComment.getContent())
+				.parent(parent)
+				.build();
 
 		// 대댓글일 경우 parent 설정
-		if (newComment.getParentUid() != null) {
-			Comment parent = commentRepository.findByUid(newComment.getParentUid())
-					.orElseThrow(() -> new IllegalArgumentException("Parent comment not found"));
-			comment.setParent(parent);
-		}
 		Comment saved = commentRepository.save(comment);
 
 		CommentsResponseDto responseDto = buildCommentReponseDto(saved, currentUser);
@@ -99,8 +99,7 @@ public class CommentServiceImpl implements CommentService {
 		Users currentUser = getCurrentUser();
 		Comment comment = commentRepository.findByUid(updateComment.getUid())
 				.orElseThrow(() -> new IllegalStateException("Current comment not found"));
-		comment.setContent(updateComment.getContent());
-		comment.setUpdatedAt(LocalDateTime.now());
+		comment.updateContent(updateComment.getContent(), currentUser.getUuid());
 
 		Comment saved = commentRepository.save(comment);
 
@@ -113,14 +112,11 @@ public class CommentServiceImpl implements CommentService {
 
 	@Override
 	public ResponseEntity<?> softDeleteComment(String targetUid) {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		if (authentication == null || !authentication.isAuthenticated()) {
-			throw new IllegalStateException("User not authenticated");
-		}
+		Users currentUser = getCurrentUser();
 		Comment comment = commentRepository.findByUid(targetUid)
 				.orElseThrow(() -> new IllegalStateException("Current comment not found"));
 
-		comment.setDeleted(true);
+		comment.markAsDeleted(currentUser.getUuid());
 		commentRepository.save(comment);
 
 		return ResponseEntity.status(HttpStatus.ACCEPTED).body("Comment successfully deleted");

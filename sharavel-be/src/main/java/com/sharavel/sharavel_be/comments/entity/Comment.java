@@ -3,7 +3,11 @@ package com.sharavel.sharavel_be.comments.entity;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import com.sharavel.sharavel_be.user.entity.Users;
 
@@ -17,24 +21,16 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.PrePersist;
 
 @Entity
 public class Comment {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(nullable = false)
-	private Long id;
+	private final Long id;
 
 	@Column(nullable = false, unique = true, updatable = false)
-	private String uid;
-
-	@PrePersist
-	public void generateUUID() {
-		if (this.uid == null) {
-			this.uid = UUID.randomUUID().toString();
-		}
-	}
+	private final String uid;
 
 	@Column(nullable = false)
 	private String targetType;
@@ -53,9 +49,11 @@ public class Comment {
 	@Column(nullable = false)
 	private String content;
 
+	@CreationTimestamp
 	@Column(nullable = false)
 	private LocalDateTime createdAt;
 
+	@UpdateTimestamp
 	@Column(nullable = true)
 	private LocalDateTime updatedAt;
 
@@ -66,91 +64,130 @@ public class Comment {
 	@OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
 	private List<Comment> replies = new ArrayList<>();
 
-	public Long getId() {
-		return id;
+	protected Comment() {
+		this.id = null;
+		this.uid = null;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	private Comment(Builder builder) {
+		this.id = null; // assigned by JPA
+		this.uid = UUID.randomUUID().toString();
+		this.targetType = Objects.requireNonNull(builder.targetType, "targetType is required");
+		this.targetUid = Objects.requireNonNull(builder.targetUid, "targetUid is required");
+		this.user = Objects.requireNonNull(builder.user, "User is required");
+		this.content = Objects.requireNonNull(builder.content, "content is required");
+		this.parent = builder.parent;
+		this.createdAt = null;
+		this.updatedAt = null;
+		this.deleted = builder.deleted;
+		this.replies = builder.replies != null ? new ArrayList<>(builder.replies) : new ArrayList<>();
+	}
+
+	public static class Builder {
+		private String targetType;
+		private String targetUid;
+		private Users user;
+		private Comment parent;
+		private String content;
+		private boolean deleted;
+		private List<Comment> replies;
+
+		public Builder(String targetType, String targetUid, Users user, String content) {
+			this.targetType = Objects.requireNonNull(targetType, "targetType is required");
+			this.targetUid = Objects.requireNonNull(targetUid, "targetUid is required");
+			this.user = Objects.requireNonNull(user, "User is required");
+			this.parent = null;
+			this.content = Objects.requireNonNull(content, "content is required");
+			this.replies = new ArrayList<>();
+			this.deleted = false;
+		}
+
+		public Builder parent(Comment parent) {
+			this.parent = parent;
+			return this;
+		}
+
+		public Builder deleted(boolean deleted) {
+			this.deleted = deleted;
+			return this;
+		}
+
+		public Builder replies(List<Comment> replies) {
+			this.replies = replies != null ? new ArrayList<>(replies) : new ArrayList<>();
+			return this;
+		}
+
+		public Comment build() {
+			return new Comment(this);
+		}
+	}
+
+	// 양방향 관계 동기화를 위한 헬퍼 메서드
+	public void addReply(Comment reply) {
+		this.replies.add(reply);
+		reply.setParent(this);
+	}
+
+	public void updateContent(String content, String authenticatedUserId) {
+		if (!this.user.getUuid().equals(authenticatedUserId)) {
+			throw new SecurityException("Unauthorized to update comment");
+		}
+		this.content = Objects.requireNonNull(content, "content is required");
+	}
+
+	public void markAsDeleted(String authenticatedUserId) {
+		if (!this.user.getUuid().equals(authenticatedUserId)) {
+			throw new SecurityException("Unauthorized to delete comment");
+		}
+		this.deleted = true;
+	}
+
+	public Long getId() {
+		return id;
 	}
 
 	public String getUid() {
 		return uid;
 	}
 
-	public void setUid(String uid) {
-		this.uid = uid;
-	}
-
 	public String getTargetType() {
 		return targetType;
-	}
-
-	public void setTargetType(String targetType) {
-		this.targetType = targetType;
 	}
 
 	public String getTargetUid() {
 		return targetUid;
 	}
 
-	public void setTargetUid(String targetUid) {
-		this.targetUid = targetUid;
-	}
-
 	public Users getUser() {
 		return user;
-	}
-
-	public void setUser(Users user) {
-		this.user = user;
 	}
 
 	public Comment getParent() {
 		return parent;
 	}
 
-	public void setParent(Comment parent) {
-		this.parent = parent;
-	}
-
 	public String getContent() {
 		return content;
-	}
-
-	public void setContent(String content) {
-		this.content = content;
 	}
 
 	public LocalDateTime getCreatedAt() {
 		return createdAt;
 	}
 
-	public void setCreatedAt(LocalDateTime createdAt) {
-		this.createdAt = createdAt;
-	}
-
-	public List<Comment> getReplies() {
-		return replies;
-	}
-
-	public void setReplies(List<Comment> replies) {
-		this.replies = replies;
-	}
-
 	public LocalDateTime getUpdatedAt() {
 		return updatedAt;
-	}
-
-	public void setUpdatedAt(LocalDateTime updatedAt) {
-		this.updatedAt = updatedAt;
 	}
 
 	public boolean isDeleted() {
 		return deleted;
 	}
 
-	public void setDeleted(boolean deleted) {
-		this.deleted = deleted;
+	public List<Comment> getReplies() {
+		return replies;
 	}
+
+	public void setParent(Comment parent) {
+		this.parent = parent;
+	}
+
 }
