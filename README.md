@@ -3,8 +3,11 @@
 
 ### 🛠️ Built With 
 Java: Spring Boot (maven -> gradle)
+
 OAuth2.0
+
 AWS S3
+
 PostgreSQL
 
 ## 🔥 Why I Built This
