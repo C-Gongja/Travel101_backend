@@ -2,8 +2,11 @@ package com.sharavel.sharavel_be.follow.entity;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import com.sharavel.sharavel_be.user.entity.Users;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -20,6 +23,7 @@ import jakarta.persistence.Table;
 public class UserFollow {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(nullable = false)
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -30,6 +34,8 @@ public class UserFollow {
 	@JoinColumn(name = "follower_id")
 	private Users follower;
 
+	@CreationTimestamp
+	@Column(nullable = false)
 	private LocalDateTime createdAt;
 
 	@PrePersist
@@ -39,10 +45,6 @@ public class UserFollow {
 
 	public Long getId() {
 		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
 	}
 
 	public Users getFollowing() {
