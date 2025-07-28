@@ -21,3 +21,31 @@ That’s why I want to build a social network focused on 🌍 travel, 🚀 explo
 This is just the beginning of my idea. I hope to share the full project with you as soon as possible!!
 
 ## How to run
+1. Clone the repository
+2. Change your current directory to the sharavel-be from the cloned project:
+```
+ $ cd <project_directory_name>/sharavel-be
+```
+3. Configure the database connection is application.properties (check the Database section for more information).
+4. run gradle project
+```
+ $ ./gradlew bootRun
+```
+If you are on Windows, use:
+```
+$ .\gradlew.bat bootRun
+```
+
+## Database
+I used PostgreSQL for this project. The database connection can be configured in the application.properties file.
+
+```
+spring.datasource.url=${DATASOURCE_URL}
+spring.datasource.username=${DATASOURCE_USERNAME}
+spring.datasource.password=${DATASOURCE_PASSWORD}
+spring.datasource.driver-class-name=${DRIVER_CLASS_NAME}
+spring.jpa.database-platform=${DB_PLATFORM}
+```
+>[!CAUTION] <br>
+>The above application.properties is configured for a Docker container using PostgreSQL. <br>
+>Your own application.properties may be different.
