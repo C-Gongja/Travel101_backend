@@ -1,15 +1,11 @@
 # Travel 101 
 가제 travel101 backend
 
-### ❓ Why Next.js?
-	- Easy to make routes
-	- Easy SSR
-	- Auto code splitting
-
 ### 🛠️ Built With 
 Java: Spring Boot (maven -> gradle)
 OAuth2.0
 AWS S3
+PostgreSQL
 
 ## 🔥 Why I Built This
 There are lots of trip planners out there in the world, but most of them focus on flight and hotel reservation systems rather than actual advantures. Furthermore, many AI-powered trip planners have been built by big companies. I get why many companies have gone in this direction — mainly for profitability and other practical reasons.
@@ -21,3 +17,4 @@ That’s why I want to build a social network focused on 🌍 travel, 🚀 explo
 
 This is just the beginning of my idea. I hope to share the full project with you as soon as possible!!
 
+## How to run
