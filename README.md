@@ -1,4 +1,4 @@
-# Travel 101 
+# Travel 101 Backend Server (Restful API)
 가제 travel101 backend
 
 ### 🛠️ Built With 
